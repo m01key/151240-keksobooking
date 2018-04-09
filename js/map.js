@@ -78,8 +78,6 @@ var getGuests = function (num) {
 
 // генерируем массив удобств
 var getFeatures = function () {
-  shakeArr(OFFER_FEATURES);
-
   var newArr = [];
   var newArrLength = getRandInt(0, OFFER_FEATURES.length);
 
@@ -101,36 +99,45 @@ var translateType = function (type) {
   }
 };
 
+// генерирует один объект данных
+var createData = function (i) {
+  var locationX = getRandInt(300, 900);
+  var locationY = getRandInt(150, 500);
+  var rooms = getRandInt(1, 5);
+  var guests = getGuests(rooms);
+  var checkin = getRandElem(OFFER_TIME);
+
+  return {
+    'author': {
+      'avatar': 'img/avatars/user0' + (i + 1) + '.png'
+    },
+    'offer': {
+      'title': OFFER_TITLES[i],
+      'address': locationX + ', ' + locationY,
+      'price': getRandInt(1000, 1000000),
+      'type': getRandElem(OFFER_TYPES),
+      'rooms': rooms,
+      'guests': guests,
+      'checkin': checkin,
+      'checkout': checkin,
+      'features': getFeatures(),
+      'description': '',
+      'photos': shakeArr(OFFER_URL_PHOTOS),
+    },
+    'location': {
+      'x': locationX,
+      'y': locationY
+    }
+  };
+
+};
+
 // генерирует массив объектов данных
-var createData = function () {
+var createDataArray = function () {
   var cards = [];
-  var avaNums = shakeArr(['01', '02', '03', '04', '05', '06', '07', '08']);
-  shakeArr(OFFER_TITLES);
 
   for (var i = 0; i < DATA_AMOUNT; i++) {
-
-    cards[i] = {
-      'author': {
-        'avatar': 'img/avatars/user' + avaNums[i] + '.png'
-      },
-      'offer': {
-        'title': OFFER_TITLES[i],
-        'address': this.location.x + ', ' + this.location.y,
-        'price': getRandInt(1000, 1000000),
-        'type': getRandElem(OFFER_TYPES),
-        'rooms': getRandInt(1, 5),
-        'guests': getGuests(this.offer.rooms),
-        'checkin': getRandElem(OFFER_TIME),
-        'checkout': this.offer.checkin,
-        'features': getFeatures(),
-        'description': '',
-        'photos': shakeArr(OFFER_URL_PHOTOS),
-      },
-      'location': {
-        'x': getRandInt(300, 900),
-        'y': getRandInt(150, 500)
-      }
-    };
+    cards[i] = createData(i);
   }
 
   return cards;
@@ -192,7 +199,7 @@ var insertCard = function (arr) {
 };
 
 
-var data = createData();
+var data = createDataArray();
 insertPins(data);
 insertCard(data);
 
