@@ -12,8 +12,8 @@ var form = document.querySelector('.ad-form');
 var fieldsets = form.querySelectorAll('fieldset');
 var address = form.querySelector('#address');
 
-for (var i = 0; i < fieldsets.length; i++) {
-  fieldsets[i].disabled = true;
+for (var j = 0; j < fieldsets.length; j++) {
+  fieldsets[j].disabled = true;
 }
 
 var OFFER_TITLES = [
@@ -255,8 +255,8 @@ var data = createDataArray();
 var getCoordsPinMain = function (center) {
   center = center === 'center' ? 2 : 1;
 
-  var left = parseInt(mapPinMain.style.left) + PIN_MAIN_SIZE / 2;
-  var right = parseInt(mapPinMain.style.top) + PIN_MAIN_SIZE / center;
+  var left = parseInt(mapPinMain.style.left, 10) + PIN_MAIN_SIZE / 2;
+  var right = parseInt(mapPinMain.style.top, 10) + PIN_MAIN_SIZE / center;
 
   return left + ', ' + right;
 };
@@ -269,7 +269,7 @@ var activateSite = function () {
     fieldsets[i].disabled = false;
   }
   address.value = getCoordsPinMain();
-}
+};
 
 address.value = getCoordsPinMain('center');
 
@@ -277,10 +277,5 @@ mapPinMain.addEventListener('mouseup', function () {
   activateSite();
   showPins(data);
 });
-
-
-
-
-
 
 
