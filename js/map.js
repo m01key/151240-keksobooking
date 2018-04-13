@@ -1,11 +1,20 @@
 'use strict';
 
-document.querySelector('.map').classList.remove('map--faded');
+// document.querySelector('.map').classList.remove('map--faded');
 
 var cardTemplate = document.querySelector('template').content.querySelector('.map__card');
 var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-var mapFilters = document.querySelector('.map__filters-container');
-var mapPins = document.querySelector('.map__pins');
+var map = document.querySelector('.map');
+var mapFilters = map.querySelector('.map__filters-container');
+var mapPins = map.querySelector('.map__pins');
+var mapPinMain = map.querySelector('.map__pin--main');
+var form = document.querySelector('.ad-form');
+var fieldsets = form.querySelectorAll('fieldset');
+var address = form.querySelector('#address');
+
+for (var i = 0; i < fieldsets.length; i++) {
+  fieldsets[i].disabled = true;
+}
 
 var OFFER_TITLES = [
   'Большая уютная квартира',
@@ -50,8 +59,9 @@ var DATA_AMOUNT = 8;
 
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
+var PIN_MAIN_SIZE = 65;
 
-// получаем рандомный элемент из массива
+// получает рандомный элемент из массива
 var getRandElem = function (arr) {
   var randomIndex = Math.random() * arr.length;
   randomIndex = Math.floor(randomIndex);
@@ -59,14 +69,14 @@ var getRandElem = function (arr) {
   return arr[randomIndex];
 };
 
-// получаем рандомное целое число от мин до макс включительно
+// получает рандомное целое число от мин до макс включительно
 var getRandInt = function (min, max) {
   var rand = Math.random() * (max - min + 1) + min;
 
   return Math.floor(rand);
 };
 
-// рандомно сортируем массив
+// сортирует рандомно массив
 var shakeArr = function (arr) {
   arr.sort(function () {
     return Math.random() - 0.5;
@@ -75,19 +85,18 @@ var shakeArr = function (arr) {
   return arr;
 };
 
-// получаем гостей для комнат
+// получает гостей для комнат
 var getGuests = function (num) {
   // if (num === 100) return 'не для гостей';
   return getRandInt(1, num);
 };
 
-// генерируем массив удобств
+// генерирует массив удобств
 var getFeatures = function () {
   shakeArr(OFFER_FEATURES);
 
   var newArr = [];
   var newArrLength = getRandInt(0, OFFER_FEATURES.length);
-
   for (var i = 0; i < newArrLength; i++) {
     newArr[i] = OFFER_FEATURES[i];
   }
@@ -153,6 +162,11 @@ var createDataArray = function () {
   return cards;
 };
 
+// закрывает карту
+var closeCard = function (card) {
+  card.parentElement.removeChild(card);
+};
+
 // создает метку
 var createPin = function (data) {
   var pin = pinTemplate.cloneNode(true);
@@ -163,11 +177,19 @@ var createPin = function (data) {
   pinImg.src = data.author.avatar;
   pinImg.alt = data.offer.title;
 
+  pin.addEventListener('click', function () {
+    var mapCard = map.querySelector('.map__card');
+    if (mapCard) {
+      closeCard(mapCard);
+    }
+    showCard(data);
+  });
+
   return pin;
 };
 
-// вставляет метки
-var insertPins = function (data) {
+// отображает метки
+var showPins = function (data) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < data.length; i++) {
@@ -212,16 +234,53 @@ var createCard = function (offerData) {
   return card;
 };
 
-//  вставляет карточку
-var insertCard = function (offerData) {
-  var card = createCard(offerData[0]);
+// отображает карточку
+var showCard = function (offerData) {
+  var card = createCard(offerData);
+  var popupCross = card.querySelector('.popup__close');
+
+  popupCross.addEventListener('click', function () {
+    closeCard(card);
+  });
 
   mapFilters.parentElement.insertBefore(card, mapFilters);
 };
 
 
 var data = createDataArray();
-insertPins(data);
-insertCard(data);
+// showPins(data);
+// showCard(data);
+
+// получает координаты главной метки (ее центр или кончик)
+var getCoordsPinMain = function (center) {
+  center = center === 'center' ? 2 : 1;
+
+  var left = parseInt(mapPinMain.style.left) + PIN_MAIN_SIZE / 2;
+  var right = parseInt(mapPinMain.style.top) + PIN_MAIN_SIZE / center;
+
+  return left + ', ' + right;
+};
+
+// активирует сайт
+var activateSite = function () {
+  map.classList.remove('map--faded');
+  form.classList.remove('ad-form--disabled');
+  for (var i = 0; i < fieldsets.length; i++) {
+    fieldsets[i].disabled = false;
+  }
+  address.value = getCoordsPinMain();
+}
+
+address.value = getCoordsPinMain('center');
+
+mapPinMain.addEventListener('mouseup', function () {
+  activateSite();
+  showPins(data);
+});
+
+
+
+
+
 
 
