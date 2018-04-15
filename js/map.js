@@ -250,8 +250,6 @@ var onPinClick = function () {
 // закрывает карту
 var closeCardElement = function (card) {
   card.parentElement.removeChild(card);
-  card.removeEventListener('click', onCrossClick);
-  card.removeEventListener('click', onPinClick);
 };
 
 // получает координаты главной метки (ее центр или кончик)
@@ -276,11 +274,11 @@ var activateSite = function () {
 
 
 // СОБЫТИЯ
-var data = createDataArray();
+var offersData = createDataArray();
 
 mapPinMainElement.addEventListener('mouseup', function () {
   activateSite();
-  showPinElements(data);
+  showPinElements(offersData);
 });
 
 
