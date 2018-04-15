@@ -19,6 +19,13 @@ var OFFER_TYPES = [
   'bungalo'
 ];
 
+var OFFER_TYPES_TRANSLATED = {
+  palace: 'Дворец',
+  flat: 'Дом',
+  house: 'Квартира',
+  bungalo: 'Лачуга'
+};
+
 var OFFER_FEATURES = [
   'wifi',
   'dishwasher',
@@ -61,12 +68,6 @@ var formElement = document.querySelector('.ad-form');
 var fieldsetElements = formElement.querySelectorAll('fieldset');
 var addressElement = formElement.querySelector('#address');
 
-var offerTypes = {
-  palace: 'Дворец',
-  flat: 'Дом',
-  house: 'Квартира',
-  bungalo: 'Лачуга'
-};
 
 // ФУНКЦИИ
 // получает рандомный элемент из массива
@@ -192,7 +193,7 @@ var createCard = function (offerData) {
   cardElement.querySelector('.popup__title').textContent = offerData.offer.title;
   cardElement.querySelector('.popup__text--address').textContent = offerData.offer.address;
   cardElement.querySelector('.popup__text--price').textContent = offerData.offer.price + '₽/ночь';
-  cardElement.querySelector('.popup__type').textContent = offerTypes[offerData.offer.type];
+  cardElement.querySelector('.popup__type').textContent = OFFER_TYPES_TRANSLATED[offerData.offer.type];
   cardElement.querySelector('.popup__text--capacity').textContent = offerData.offer.rooms + ' комнаты для ' + offerData.offer.guests + ' гостей';
   cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + offerData.offer.checkin + ', выезд до ' + offerData.offer.checkout;
   cardElement.querySelector('.popup__description').textContent = offerData.offer.description;
