@@ -43,11 +43,14 @@ var OFFER_TIME = [
 var DATA_AMOUNT = 8;
 
 var PIN_WIDTH = 50;
+
 var PIN_HEIGHT = 70;
+
 var PIN_MAIN_SIZE = 65;
 
 
-// ПЕРЕМЕННЫЕ (пути)
+// ПЕРЕМЕННЫЕ
+// пути
 var cardTemplateElement = document.querySelector('template').content.querySelector('.map__card');
 var pinTemplateElement = document.querySelector('template').content.querySelector('.map__pin');
 var mapElement = document.querySelector('.map');
@@ -58,6 +61,12 @@ var formElement = document.querySelector('.ad-form');
 var fieldsetElements = formElement.querySelectorAll('fieldset');
 var addressElement = formElement.querySelector('#address');
 
+var offerTypes = {
+  palace: 'Дворец',
+  flat: 'Дом',
+  house: 'Квартира',
+  bungalo: 'Лачуга'
+};
 
 // ФУНКЦИИ
 // получает рандомный элемент из массива
@@ -100,20 +109,6 @@ var getFeatures = function () {
   }
 
   return newArr;
-};
-
-// переводит тип жилья на русский
-var translateType = function (type) {
-  var translatedTypes = ['Дворец', 'Дом', 'Квартира', 'Лачуга'];
-
-  for (var i = 0; i < OFFER_TYPES.length; i++) {
-    if (OFFER_TYPES[i] === type) {
-      var translatedType = translatedTypes[i];
-      break;
-    }
-  }
-
-  return translatedType;
 };
 
 // генерирует один объект данных
@@ -197,7 +192,7 @@ var createCardElement = function (offerData) {
   cardElement.querySelector('.popup__title').textContent = offerData.offer.title;
   cardElement.querySelector('.popup__text--address').textContent = offerData.offer.address;
   cardElement.querySelector('.popup__text--price').textContent = offerData.offer.price + '₽/ночь';
-  cardElement.querySelector('.popup__type').textContent = translateType(offerData.offer.type);
+  cardElement.querySelector('.popup__type').textContent = offerTypes[offerData.offer.type];
   cardElement.querySelector('.popup__text--capacity').textContent = offerData.offer.rooms + ' комнаты для ' + offerData.offer.guests + ' гостей';
   cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + offerData.offer.checkin + ', выезд до ' + offerData.offer.checkout;
   cardElement.querySelector('.popup__description').textContent = offerData.offer.description;
