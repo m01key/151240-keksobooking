@@ -156,7 +156,7 @@ var createDataArray = function () {
 };
 
 // создает метку
-var createPinElement = function (data) {
+var createPin = function (data) {
   var pinElement = pinTemplateElement.cloneNode(true);
   var pinImgElement = pinElement.querySelector('img');
 
@@ -166,25 +166,25 @@ var createPinElement = function (data) {
   pinImgElement.alt = data.offer.title;
   pinElement.addEventListener('click', onPinClick);
   pinElement.addEventListener('click', function () {
-    showCardElement(data);
+    showCard(data);
   });
 
   return pinElement;
 };
 
 // отображает метки
-var showPinElements = function (data) {
+var showPins = function (data) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < data.length; i++) {
-    fragment.appendChild(createPinElement(data[i]));
+    fragment.appendChild(createPin(data[i]));
   }
 
   mapPinsElement.appendChild(fragment);
 };
 
 // создает карточку
-var createCardElement = function (offerData) {
+var createCard = function (offerData) {
   var cardElement = cardTemplateElement.cloneNode(true);
   var featureElement = cardElement.querySelector('.popup__features');
   var photoElement = cardElement.querySelector('.popup__photos');
@@ -219,8 +219,8 @@ var createCardElement = function (offerData) {
 };
 
 // отображает карточку
-var showCardElement = function (offerData) {
-  var cardElement = createCardElement(offerData);
+var showCard = function (offerData) {
+  var cardElement = createCard(offerData);
   var popupCrossElement = cardElement.querySelector('.popup__close');
 
   popupCrossElement.addEventListener('click', onCrossClick);
@@ -231,19 +231,19 @@ var showCardElement = function (offerData) {
 // обработчик закрытия на крестик
 var onCrossClick = function (e) {
   var cardElement = e.target.closest('.map__card');
-  closeCardElement(cardElement);
+  closeCard(cardElement);
 };
 
 // обработчик закрытия на метку
 var onPinClick = function () {
   var mapCardElement = mapElement.querySelector('.map__card');
   if (mapCardElement) {
-    closeCardElement(mapCardElement);
+    closeCard(mapCardElement);
   }
 };
 
 // закрывает карту
-var closeCardElement = function (card) {
+var closeCard = function (card) {
   card.parentElement.removeChild(card);
 };
 
@@ -273,7 +273,7 @@ var offersData = createDataArray();
 
 mapPinMainElement.addEventListener('mouseup', function () {
   activateSite();
-  showPinElements(offersData);
+  showPins(offersData);
 });
 
 
