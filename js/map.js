@@ -277,25 +277,23 @@ var activateSite = function () {
 var checkValiditation = function () {
   var roomsValue = roomsElement.value;
   var guestsValue = guestsElement.value;
+  var errorMessage = '';
 
-  if (roomsValue === '100' & guestsValue !== '0') {
-    guestsElement.setCustomValidity('необходимо выбрать "не для гостей"');
-  } else if (roomsValue !== '100' & guestsValue === '0') {
-    guestsElement.setCustomValidity('необходимо выбрать как минимум 1 гостя, но не более ' + roomsValue + ' гостей');
+  if (roomsValue === '100' && guestsValue !== '0') {
+    errorMessage = 'необходимо выбрать "не для гостей"';
+  } else if (roomsValue !== '100' && guestsValue === '0') {
+    errorMessage = 'необходимо выбрать как минимум 1 гостя, но не более ' + roomsValue + ' гостей';
   } else if (roomsValue < guestsValue) {
-    guestsElement.setCustomValidity('необходимо выбрать не более ' + roomsValue + ' гостей');
-  } else {
-    guestsElement.setCustomValidity('');
+    errorMessage = 'необходимо выбрать не более ' + roomsValue + ' гостей';
   }
+
+  guestsElement.setCustomValidity(errorMessage);
 };
 
-var changeTime = function (e) {
-  if (e.target === timeinElement) {
-    timeoutElement.value = timeinElement.value;
-  } else {
-    timeinElement.value = timeoutElement.value;
-  }
+var changeTime = function (target, value) {
+  target.value = value;
 };
+
 
 // СОБЫТИЯ
 var offersData = createDataArray();
@@ -313,28 +311,31 @@ roomsElement.addEventListener('change', function () {
   checkValiditation();
 });
 
-timeinElement.addEventListener('change', function (e) {
-  changeTime(e);
+timeinElement.addEventListener('change', function () {
+  changeTime(timeoutElement, timeinElement.value);
 });
 
-timeoutElement.addEventListener('change', function (e) {
-  changeTime(e);
+timeoutElement.addEventListener('change', function () {
+  changeTime(timeinElement, timeoutElement.value);
 });
 
 typeElement.addEventListener('change', function () {
-  var typeValue = typeElement.value;
-  if (typeValue === 'bungalo') {
-    priceElement.min = 0;
-    priceElement.placeholder = 0;
-  } else if (typeValue === 'flat') {
-    priceElement.min = 1000;
-    priceElement.placeholder = 1000;
-  } else if (typeValue === 'house') {
-    priceElement.min = 5000;
-    priceElement.placeholder = 5000;
-  } else {
-    priceElement.min = 10000;
-    priceElement.placeholder = 10000;
+  switch (typeElement.value) {
+    case 'bungalo':
+      priceElement.min = 0;
+      priceElement.placeholder = 0;
+      break;
+    case 'flat':
+      priceElement.min = 1000;
+      priceElement.placeholder = 1000;
+      break;
+    case 'house':
+      priceElement.min = 5000;
+      priceElement.placeholder = 5000;
+      break;
+    default:
+      priceElement.min = 10000;
+      priceElement.placeholder = 10000;
   }
 });
 
