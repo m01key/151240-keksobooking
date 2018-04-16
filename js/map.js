@@ -67,6 +67,12 @@ var mapPinMainElement = mapElement.querySelector('.map__pin--main');
 var formElement = document.querySelector('.ad-form');
 var fieldsetElements = formElement.querySelectorAll('fieldset');
 var addressElement = formElement.querySelector('#address');
+var roomsElement = formElement.querySelector('#room_number');
+var guestsElement = formElement.querySelector('#capacity');
+var timeinElement = formElement.querySelector('#timein');
+var timeoutElement = formElement.querySelector('#timeout');
+var typeElement = formElement.querySelector('#type');
+var priceElement = formElement.querySelector('#price');
 
 
 // ФУНКЦИИ
@@ -268,6 +274,26 @@ var activateSite = function () {
   addressElement.value = getCoordsPinMain();
 };
 
+var checkValiditation = function () {
+  var roomsValue = roomsElement.value;
+  var guestsValue = guestsElement.value;
+  var errorMessage = '';
+
+  if (roomsValue === '100' && guestsValue !== '0') {
+    errorMessage = 'необходимо выбрать "не для гостей"';
+  } else if (roomsValue !== '100' && guestsValue === '0') {
+    errorMessage = 'необходимо выбрать как минимум 1 гостя, но не более ' + roomsValue + ' гостей';
+  } else if (roomsValue < guestsValue) {
+    errorMessage = 'необходимо выбрать не более ' + roomsValue + ' гостей';
+  }
+
+  guestsElement.setCustomValidity(errorMessage);
+};
+
+var changeTime = function (target, value) {
+  target.value = value;
+};
+
 
 // СОБЫТИЯ
 var offersData = createDataArray();
@@ -275,6 +301,42 @@ var offersData = createDataArray();
 mapPinMainElement.addEventListener('mouseup', function () {
   activateSite();
   showPins(offersData);
+});
+
+guestsElement.addEventListener('change', function () {
+  checkValiditation();
+});
+
+roomsElement.addEventListener('change', function () {
+  checkValiditation();
+});
+
+timeinElement.addEventListener('change', function () {
+  changeTime(timeoutElement, timeinElement.value);
+});
+
+timeoutElement.addEventListener('change', function () {
+  changeTime(timeinElement, timeoutElement.value);
+});
+
+typeElement.addEventListener('change', function () {
+  switch (typeElement.value) {
+    case 'bungalo':
+      priceElement.min = 0;
+      priceElement.placeholder = 0;
+      break;
+    case 'flat':
+      priceElement.min = 1000;
+      priceElement.placeholder = 1000;
+      break;
+    case 'house':
+      priceElement.min = 5000;
+      priceElement.placeholder = 5000;
+      break;
+    default:
+      priceElement.min = 10000;
+      priceElement.placeholder = 10000;
+  }
 });
 
 
