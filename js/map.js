@@ -77,36 +77,36 @@ var priceElement = formElement.querySelector('#price');
 
 // ФУНКЦИИ
 // получает рандомный элемент из массива
-var getRandElem = function (arr) {
+function getRandElem(arr) {
   var randomIndex = Math.random() * arr.length;
   randomIndex = Math.floor(randomIndex);
 
   return arr[randomIndex];
-};
+}
 
 // получает рандомное целое число от мин до макс включительно
-var getRandInt = function (min, max) {
+function getRandInt(min, max) {
   var rand = Math.random() * (max - min + 1) + min;
 
   return Math.floor(rand);
-};
+}
 
 // сортирует рандомно массив
-var shakeArr = function (arr) {
+function shakeArr(arr) {
   arr.sort(function () {
     return Math.random() - 0.5;
   });
 
   return arr;
-};
+}
 
 // получает гостей для комнат
-var getGuests = function (num) {
+function getGuests(num) {
   return getRandInt(1, num);
-};
+}
 
 // генерирует массив удобств
-var getFeatures = function () {
+function getFeatures() {
   shakeArr(OFFER_FEATURES);
 
   var newArr = [];
@@ -116,10 +116,10 @@ var getFeatures = function () {
   }
 
   return newArr;
-};
+}
 
 // генерирует один объект данных
-var createData = function (i) {
+function createData(i) {
   var locationX = getRandInt(300, 900);
   var locationY = getRandInt(150, 500);
   var rooms = getRandInt(1, 5);
@@ -149,10 +149,10 @@ var createData = function (i) {
     }
   };
 
-};
+}
 
 // генерирует массив объектов данных
-var createDataArray = function () {
+function createDataArray() {
   var cards = [];
 
   for (var i = 0; i < DATA_AMOUNT; i++) {
@@ -160,10 +160,10 @@ var createDataArray = function () {
   }
 
   return cards;
-};
+}
 
 // создает метку
-var createPin = function (data) {
+function createPin(data) {
   var pinElement = pinTemplateElement.cloneNode(true);
   var pinImgElement = pinElement.querySelector('img');
 
@@ -177,10 +177,10 @@ var createPin = function (data) {
   });
 
   return pinElement;
-};
+}
 
 // отображает метки
-var showPins = function (data) {
+function showPins(data) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < data.length; i++) {
@@ -188,10 +188,10 @@ var showPins = function (data) {
   }
 
   mapPinsElement.appendChild(fragment);
-};
+}
 
 // создает карточку
-var createCard = function (offerData) {
+function createCard(offerData) {
   var cardElement = cardTemplateElement.cloneNode(true);
   var featureElement = cardElement.querySelector('.popup__features');
   var photoElement = cardElement.querySelector('.popup__photos');
@@ -223,17 +223,17 @@ var createCard = function (offerData) {
   cardElement.querySelector('.popup__avatar').src = offerData.author.avatar;
 
   return cardElement;
-};
+}
 
 // отображает карточку
-var showCard = function (offerData) {
+function showCard(offerData) {
   var cardElement = createCard(offerData);
   var popupCrossElement = cardElement.querySelector('.popup__close');
 
   popupCrossElement.addEventListener('click', onCrossClick);
 
   mapFiltersElement.parentElement.insertBefore(cardElement, mapFiltersElement);
-};
+}
 
 // обработчик закрытия на крестик
 var onCrossClick = function (e) {
@@ -242,39 +242,39 @@ var onCrossClick = function (e) {
 };
 
 // обработчик закрытия на метку
-var onPinClick = function () {
+function onPinClick() {
   var mapCardElement = mapElement.querySelector('.map__card');
   if (mapCardElement) {
     closeCard(mapCardElement);
   }
-};
+}
 
 // закрывает карту
-var closeCard = function (card) {
+function closeCard(card) {
   card.parentElement.removeChild(card);
-};
+}
 
 // получает координаты главной метки (ее центр или кончик)
-var getCoordsPinMain = function (center) {
+function getCoordsPinMain(center) {
   var shift = center === 'center' ? 2 : 1;
 
   var left = parseInt(mapPinMainElement.offsetLeft, 10) + PIN_MAIN_SIZE / 2;
   var top = parseInt(mapPinMainElement.offsetTop, 10) + PIN_MAIN_SIZE / shift;
 
   return left + ', ' + top;
-};
+}
 
 // активирует сайт
-var activateSite = function () {
+function activateSite() {
   mapElement.classList.remove('map--faded');
   formElement.classList.remove('ad-form--disabled');
   for (var i = 0; i < fieldsetElements.length; i++) {
     fieldsetElements[i].disabled = false;
   }
   addressElement.value = getCoordsPinMain();
-};
+}
 
-var checkValiditation = function () {
+function checkValiditation() {
   var roomsValue = roomsElement.value;
   var guestsValue = guestsElement.value;
   var errorMessage = '';
@@ -288,11 +288,11 @@ var checkValiditation = function () {
   }
 
   guestsElement.setCustomValidity(errorMessage);
-};
+}
 
-var changeTime = function (target, value) {
+function changeTime(target, value) {
   target.value = value;
-};
+}
 
 
 // СОБЫТИЯ
