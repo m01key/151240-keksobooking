@@ -298,6 +298,56 @@ function changeTime(target, value) {
 // СОБЫТИЯ
 var offersData = createDataArray();
 
+mapPinMainElement.addEventListener('mousedown', function (e) {
+  var maxLeft = mapElement.offsetWidth - PIN_MAIN_SIZE;
+  var maxTop = mapElement.offsetHeight - mapFiltersElement.offsetHeight - PIN_MAIN_SIZE;
+  var minLeft = 0;
+  var minTop = 0;
+
+  var startX = e.clientX;
+  var startY = e.clientY;
+
+  function onMouseMove(evt) {
+    var endX = evt.clientX;
+    var endY = evt.clientY;
+
+    var shiftLeft = endX - startX;
+    var shiftTop = endY - startY;
+
+    var newLeft = mapPinMainElement.offsetLeft + shiftLeft;
+    var newTop = mapPinMainElement.offsetTop + shiftTop;
+
+    if (newLeft < minLeft) {
+      newLeft = 0;
+    } else if (newLeft > maxLeft) {
+      newLeft = maxLeft;
+    }
+
+    if (newTop < minTop) {
+      newTop = 0;
+    } else if (newTop > maxTop) {
+      newTop = maxTop;
+    }
+
+    mapPinMainElement.style.left = newLeft + 'px';
+    mapPinMainElement.style.top = newTop + 'px';
+
+    addressElement.value = getCoordsPinMain();
+
+    startX = endX;
+    startY = endY;
+  }
+
+  function onMouseUp() {
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+  
+});
+
 mapPinMainElement.addEventListener('mouseup', function () {
   activateSite();
   showPins(offersData);
@@ -346,5 +396,4 @@ for (var j = 0; j < fieldsetElements.length; j++) {
 }
 
 addressElement.value = getCoordsPinMain('center');
-
 
