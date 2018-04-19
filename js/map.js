@@ -55,9 +55,13 @@ var PIN_HEIGHT = 70;
 
 var PIN_MAIN_SIZE = 65;
 
+var PIN_MIN_Y = 150;
+
 var PIN_MAX_Y = 500;
 
-var PIN_MIN_Y = 150;
+var PIN_MIN_X = 300;
+
+var PIN_MAX_X = 900;
 
 
 // ПЕРЕМЕННЫЕ
@@ -125,7 +129,7 @@ function getFeatures() {
 
 // генерирует один объект данных
 function createData(i) {
-  var locationX = getRandInt(300, 900);
+  var locationX = getRandInt(PIN_MIN_X, PIN_MAX_X);
   var locationY = getRandInt(PIN_MIN_Y, PIN_MAX_Y);
   var rooms = getRandInt(1, 5);
   var guests = getGuests(rooms);
@@ -308,11 +312,7 @@ function changeTime(target, value) {
   target.value = value;
 }
 
-
-// СОБЫТИЯ
-var offersData = createDataArray();
-
-formElement.addEventListener('reset', function () {
+function onResetClick() {
   mapPinMainElement.style.left = pinMainLeft + 'px';
   mapPinMainElement.style.top = pinMainTop + 'px';
   var pins = mapPinsElement.querySelectorAll('.map__pin');
@@ -329,9 +329,9 @@ formElement.addEventListener('reset', function () {
   setTimeout(function () {
     deactivate();
   }, 0);
-});
+}
 
-mapPinMainElement.addEventListener('mousedown', function (e) {
+function onPinMainMove(e) {
   var maxLeft = mapElement.offsetWidth - PIN_MAIN_SIZE;
   var minLeft = 0;
   var maxTop = PIN_MAX_Y - PIN_MAIN_SIZE;
@@ -378,31 +378,26 @@ mapPinMainElement.addEventListener('mousedown', function (e) {
 
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
+}
 
-});
-
-mapPinMainElement.addEventListener('mouseup', function () {
+function onPinMainMouseUp() {
   activateSite();
   showPins(offersData);
-});
+}
 
-guestsElement.addEventListener('change', function () {
+function onElementChange() {
   checkValiditation();
-});
+}
 
-roomsElement.addEventListener('change', function () {
-  checkValiditation();
-});
-
-timeinElement.addEventListener('change', function () {
+function onTimeinChange() {
   changeTime(timeoutElement, timeinElement.value);
-});
+}
 
-timeoutElement.addEventListener('change', function () {
+function onTimeoutChange() {
   changeTime(timeinElement, timeoutElement.value);
-});
+}
 
-typeElement.addEventListener('change', function () {
+function onTypeChange() {
   switch (typeElement.value) {
     case 'bungalo':
       priceElement.min = 0;
@@ -420,7 +415,26 @@ typeElement.addEventListener('change', function () {
       priceElement.min = 10000;
       priceElement.placeholder = 10000;
   }
-});
+}
+
+// СОБЫТИЯ
+var offersData = createDataArray();
+
+formElement.addEventListener('reset', onResetClick);
+
+mapPinMainElement.addEventListener('mousedown', onPinMainMove);
+
+mapPinMainElement.addEventListener('mouseup', onPinMainMouseUp);
+
+guestsElement.addEventListener('change', onElementChange);
+
+roomsElement.addEventListener('change', onElementChange);
+
+timeinElement.addEventListener('change', onTimeinChange);
+
+timeoutElement.addEventListener('change', onTimeoutChange);
+
+typeElement.addEventListener('change', onTypeChange);
 
 
 // ВЫПОЛНЕНИЕ
