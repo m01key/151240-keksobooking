@@ -55,6 +55,10 @@ var PIN_HEIGHT = 70;
 
 var PIN_MAIN_SIZE = 65;
 
+var PIN_MAX_Y = 500;
+
+var PIN_MIN_Y = 150;
+
 
 // ПЕРЕМЕННЫЕ
 // пути
@@ -73,7 +77,8 @@ var timeinElement = formElement.querySelector('#timein');
 var timeoutElement = formElement.querySelector('#timeout');
 var typeElement = formElement.querySelector('#type');
 var priceElement = formElement.querySelector('#price');
-
+var pinMainLeft = mapPinMainElement.offsetLeft;
+var pinMainTop = mapPinMainElement.offsetTop;
 
 // ФУНКЦИИ
 // получает рандомный элемент из массива
@@ -121,7 +126,7 @@ function getFeatures() {
 // генерирует один объект данных
 function createData(i) {
   var locationX = getRandInt(300, 900);
-  var locationY = getRandInt(150, 500);
+  var locationY = getRandInt(PIN_MIN_Y, PIN_MAX_Y);
   var rooms = getRandInt(1, 5);
   var guests = getGuests(rooms);
   var checkin = getRandElem(OFFER_TIME);
@@ -274,6 +279,15 @@ function activateSite() {
   addressElement.value = getCoordsPinMain();
 }
 
+function deactivate() {
+  mapElement.classList.add('map--faded');
+  formElement.classList.add('ad-form--disabled');
+  for (var i = 0; i < fieldsetElements.length; i++) {
+    fieldsetElements[i].disabled = true;
+  }
+  addressElement.value = getCoordsPinMain();
+}
+
 function checkValiditation() {
   var roomsValue = roomsElement.value;
   var guestsValue = guestsElement.value;
@@ -298,11 +312,30 @@ function changeTime(target, value) {
 // СОБЫТИЯ
 var offersData = createDataArray();
 
+formElement.addEventListener('reset', function () {
+  mapPinMainElement.style.left = pinMainLeft + 'px';
+  mapPinMainElement.style.top = pinMainTop + 'px';
+  var pins = mapPinsElement.querySelectorAll('.map__pin');
+  var card = mapElement.querySelector('.map__card');
+
+  if (card) {
+    closeCard(card);
+  }
+
+  for (var i = 1; i < pins.length; i++) {
+    mapPinsElement.removeChild(pins[i]);
+  }
+
+  setTimeout(function () {
+    deactivate();
+  }, 0);
+});
+
 mapPinMainElement.addEventListener('mousedown', function (e) {
   var maxLeft = mapElement.offsetWidth - PIN_MAIN_SIZE;
-  var maxTop = mapElement.offsetHeight - mapFiltersElement.offsetHeight - PIN_MAIN_SIZE;
   var minLeft = 0;
-  var minTop = 0;
+  var maxTop = PIN_MAX_Y - PIN_MAIN_SIZE;
+  var minTop = PIN_MIN_Y - PIN_MAIN_SIZE;
 
   var startX = e.clientX;
   var startY = e.clientY;
@@ -318,13 +351,13 @@ mapPinMainElement.addEventListener('mousedown', function (e) {
     var newTop = mapPinMainElement.offsetTop + shiftTop;
 
     if (newLeft < minLeft) {
-      newLeft = 0;
+      newLeft = minLeft;
     } else if (newLeft > maxLeft) {
       newLeft = maxLeft;
     }
 
     if (newTop < minTop) {
-      newTop = 0;
+      newTop = minTop;
     } else if (newTop > maxTop) {
       newTop = maxTop;
     }
@@ -345,7 +378,7 @@ mapPinMainElement.addEventListener('mousedown', function (e) {
 
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
-  
+
 });
 
 mapPinMainElement.addEventListener('mouseup', function () {
