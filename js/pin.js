@@ -17,10 +17,7 @@
     pinImgElement.src = data.author.avatar;
     pinImgElement.alt = data.offer.title;
     pinImgElement.addEventListener('click', function () {
-      var mapCardElement = document.querySelector('.map__card');
-      if (mapCardElement) {
-        window.card.close(mapCardElement);
-      }
+      window.card.close();
       window.card.show(data);
     });
 

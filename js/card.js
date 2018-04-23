@@ -59,8 +59,11 @@
     mapFiltersElement.parentElement.insertBefore(cardElement, mapFiltersElement);
   }
 
-  function closeCard(card) {
-    card.parentElement.removeChild(card);
+  function closeCard() {
+    var mapCardElement = document.querySelector('.map__card');
+    if (mapCardElement) {
+      mapCardElement.parentElement.removeChild(mapCardElement);
+    }
   }
 
 

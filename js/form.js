@@ -46,16 +46,12 @@
   }
 
   function onResetClick() {
+    var pins = mapPinsElement.querySelectorAll('.map__pin');
     mapElement.classList.add('map--faded');
     formElement.classList.add('ad-form--disabled');
     mapPinMainElement.style.left = pinMainLeft + 'px';
     mapPinMainElement.style.top = pinMainTop + 'px';
-    var card = mapElement.querySelector('.map__card');
-    var pins = mapPinsElement.querySelectorAll('.map__pin');
-
-    if (card) {
-      window.card.close(card);
-    }
+    window.card.close();
     for (var i = 1; i < pins.length; i++) {
       mapPinsElement.removeChild(pins[i]);
     }
