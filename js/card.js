@@ -10,11 +10,12 @@
   };
 
   var cardTemplateElement = document.querySelector('template').content.querySelector('.map__card');
+  var mapFiltersElement = document.querySelector('.map__filters-container');
 
 
   function onCardCrossClick(e) {
     var cardElement = e.target.closest('.map__card');
-    cardElement.parentElement.removeChild(cardElement);
+    closeCard(cardElement);
   }
 
   function createCard(offerData) {
@@ -53,9 +54,19 @@
     return cardElement;
   }
 
+  function showCard(offerData) {
+    var cardElement = createCard(offerData);
+    mapFiltersElement.parentElement.insertBefore(cardElement, mapFiltersElement);
+  }
+
+  function closeCard(card) {
+    card.parentElement.removeChild(card);
+  }
+
 
   window.card = {
-    create: createCard
+    show: showCard,
+    close: closeCard
   };
 
 })();

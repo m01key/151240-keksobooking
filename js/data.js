@@ -126,9 +126,7 @@
   }
 
 
-  window.data = {
-    offers: createDataArray()
-  };
+  window.offersData = createDataArray();
 
 })();
 

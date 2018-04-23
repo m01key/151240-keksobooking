@@ -54,7 +54,7 @@
     var pins = mapPinsElement.querySelectorAll('.map__pin');
 
     if (card) {
-      card.parentElement.removeChild(card);
+      window.card.close(card);
     }
     for (var i = 1; i < pins.length; i++) {
       mapPinsElement.removeChild(pins[i]);
