@@ -8,10 +8,19 @@
 
   var mapElement = document.querySelector('.map');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
+  var mapPinsElement = document.querySelector('.map__pins');
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
 
+
+  function showPins(data) {
+    var fragment = document.createDocumentFragment();
+    for (var i = 0; i < data.length; i++) {
+      fragment.appendChild(window.pin.create(data[i]));
+    }
+    mapPinsElement.appendChild(fragment);
+  }
 
   function getCoordsPinMain(center) {
     var shift = center === 'center' ? 2 : 1;
@@ -72,7 +81,7 @@
 
     function onMouseUp() {
       activateSite();
-      window.pin.show(window.offersData);
+      showPins(window.data.offers);
 
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
