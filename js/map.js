@@ -49,6 +49,7 @@
     }
     addressElement.value = getCoordsPinMain();
     window.backend.load(onLoadSuccess, onError);
+    window.map.isActive = true;
   }
 
   function onPinMainMouseDown(e) {
@@ -94,7 +95,6 @@
     function onMouseUp() {
       if (!window.map.isActive) {
         activateSite();
-        window.map.isActive = true;
       }
 
       document.removeEventListener('mousemove', onMouseMove);

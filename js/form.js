@@ -39,6 +39,7 @@
       mapPinsElement.removeChild(pins[i]);
     }
     disableForm();
+    window.map.isActive = false;
   }
 
   function checkValiditation() {
@@ -70,19 +71,18 @@
     }, 3000);
   }
 
-  function onSubmitClick(e) {
+  function onFormSubmit(e) {
     e.preventDefault();
 
-    var form = new FormData(formElement);
-    window.backend.upload(form, onUploadSuccess, window.map.onError);
+    var formData = new FormData(formElement);
+    window.backend.upload(formData, onUploadSuccess, window.map.onError);
     window.map.isActive = false;
   }
 
-  function onResetClick(e) {
+  function onFormReset(e) {
     e.preventDefault();
 
     deactivateSite();
-    window.map.isActive = false;
   }
 
   function onElementChange() {
@@ -118,8 +118,8 @@
   }
 
 
-  resetButtonElement.addEventListener('click', onResetClick);
-  formElement.addEventListener('submit', onSubmitClick);
+  resetButtonElement.addEventListener('click', onFormReset);
+  formElement.addEventListener('submit', onFormSubmit);
   guestsElement.addEventListener('change', onElementChange);
   roomsElement.addEventListener('change', onElementChange);
   timeinElement.addEventListener('change', onTimeinChange);
