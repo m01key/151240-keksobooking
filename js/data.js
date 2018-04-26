@@ -62,7 +62,7 @@
     return Math.floor(rand);
   }
 
-  function shakeArr(arr) {
+  function shuffleArray(arr) {
     arr.sort(function () {
       return Math.random() - 0.5;
     });
@@ -75,7 +75,7 @@
   }
 
   function getFeatures() {
-    shakeArr(OFFER_FEATURES);
+    shuffleArray(OFFER_FEATURES);
     var newArr = [];
     var newArrLength = getRandInt(0, OFFER_FEATURES.length);
     for (var i = 0; i < newArrLength; i++) {

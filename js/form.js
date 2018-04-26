@@ -2,10 +2,12 @@
 
 (function () {
 
+  var notification = document.querySelector('.success');
   var mapElement = document.querySelector('.map');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
   var formElement = document.querySelector('.ad-form');
+  var resetButtonElement = formElement.querySelector('.ad-form__reset');
   var roomsElement = formElement.querySelector('#room_number');
   var guestsElement = formElement.querySelector('#capacity');
   var timeinElement = formElement.querySelector('#timein');
@@ -22,7 +24,22 @@
     for (var i = 0; i < fieldsetElements.length; i++) {
       fieldsetElements[i].disabled = true;
     }
+    formElement.reset();
     addressElement.value = window.map.getCoordsPinMain();
+  }
+
+  function deactivateSite() {
+    var pins = mapPinsElement.querySelectorAll('.map__pin');
+    mapElement.classList.add('map--faded');
+    formElement.classList.add('ad-form--disabled');
+    mapPinMainElement.style.left = pinMainLeft + 'px';
+    mapPinMainElement.style.top = pinMainTop + 'px';
+    window.card.close();
+    for (var i = 1; i < pins.length; i++) {
+      mapPinsElement.removeChild(pins[i]);
+    }
+    disableForm();
+    window.map.isActive = false;
   }
 
   function checkValiditation() {
@@ -45,20 +62,27 @@
     target.value = value;
   }
 
-  function onResetClick() {
-    var pins = mapPinsElement.querySelectorAll('.map__pin');
-    mapElement.classList.add('map--faded');
-    formElement.classList.add('ad-form--disabled');
-    mapPinMainElement.style.left = pinMainLeft + 'px';
-    mapPinMainElement.style.top = pinMainTop + 'px';
-    window.card.close();
-    for (var i = 1; i < pins.length; i++) {
-      mapPinsElement.removeChild(pins[i]);
-    }
+  function onUploadSuccess() {
+    deactivateSite();
+    notification.classList.remove('hidden');
 
     setTimeout(function () {
-      disableForm();
-    }, 0);
+      notification.classList.add('hidden');
+    }, 3000);
+  }
+
+  function onFormSubmit(e) {
+    e.preventDefault();
+
+    var formData = new FormData(formElement);
+    window.backend.upload(formData, onUploadSuccess, window.map.onError);
+    window.map.isActive = false;
+  }
+
+  function onFormReset(e) {
+    e.preventDefault();
+
+    deactivateSite();
   }
 
   function onElementChange() {
@@ -94,7 +118,8 @@
   }
 
 
-  formElement.addEventListener('reset', onResetClick);
+  resetButtonElement.addEventListener('click', onFormReset);
+  formElement.addEventListener('submit', onFormSubmit);
   guestsElement.addEventListener('change', onElementChange);
   roomsElement.addEventListener('change', onElementChange);
   timeinElement.addEventListener('change', onTimeinChange);
