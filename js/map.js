@@ -14,9 +14,15 @@
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
   var mapFiltersElement = mapElement.querySelector('.map__filters');
+  var filterTypeElement = mapFiltersElement.elements['housing-type'];
+  var filterPriceElement = mapFiltersElement.elements['housing-price'];
+  var filterRoomsElement = mapFiltersElement.elements['housing-rooms'];
+  var filterGuestsElement = mapFiltersElement.elements['housing-guests'];
+  var filterFeatures = mapFiltersElement.elements['features'];
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
+
   var offersData;
   var timerId;
 
@@ -29,18 +35,6 @@
     timerId = setTimeout(function () {
       callback(data);
     }, DEBOUNCE_TIME);
-  }
-
-  function isContainCheckedFeature(offerFeatures, filterFeatures) {
-    var filterFeaturesChecked = [].filter.call(filterFeatures, function (elem) {
-      return elem.checked;
-    });
-    for (var i = 0; i < filterFeaturesChecked.length; i++) {
-      if (offerFeatures.indexOf(filterFeaturesChecked[i].value) === -1) {
-        return false;
-      }
-    }
-    return true;
   }
 
   function renderPins(data) {
@@ -79,53 +73,71 @@
     window.map.isActive = true;
   }
 
+  function checkPrice(offerVal, filterVal) {
+    if (filterVal === 'any') {
+      return true;
+    }
+    if (filterVal === 'low' && offerVal < 10000) {
+      return true;
+    }
+    if (filterVal === 'middle' && offerVal >= 10000 && offerVal < 50000) {
+      return true;
+    }
+    if (filterVal === 'high' && offerVal >= 50000) {
+      return true;
+    }
+    return false;
+  }
+
+  function checkField(offerVal, filterVal) {
+    var transformed = parseInt(filterVal, 10);
+    filterVal = isNaN(transformed) ? filterVal : transformed;
+    switch (filterVal) {
+      case 'any':
+        return true;
+      case offerVal:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  function checkFeature(offerValArr, filterValArr) {
+    var filterCheckedArr = [].filter.call(filterValArr, function (elem) {
+      return elem.checked;
+    });
+    for (var i = 0; i < filterCheckedArr.length; i++) {
+      if (offerValArr.indexOf(filterCheckedArr[i].value) === -1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   function onFilterChange() {
-    var typeFilterVal = mapFiltersElement.elements['housing-type'].value;
-    var priceFilterVal = mapFiltersElement.elements['housing-price'].value;
-    var roomsFilterVal = mapFiltersElement.elements['housing-rooms'].value;
-    var guestsFilterVal = mapFiltersElement.elements['housing-guests'].value;
-    var featuresFilter = mapFiltersElement.elements['features'];
+    var filterTypeVal = filterTypeElement.value;
+    var filterRoomsVal = filterRoomsElement.value;
+    var filterGuestsVal = filterGuestsElement.value;
+    var filterPriceVal = filterPriceElement.value;
 
     var offersFiltered = offersData.filter(function (elem) {
 
-      var i = 0;
-
-      if (isContainCheckedFeature(elem.offer.features, featuresFilter)) {
-        i += 1;
+      if (!checkField(elem.offer.type, filterTypeVal)) {
+        return false;
       }
-
-      if (typeFilterVal === 'any') {
-        i += 1;
-      } else if (elem.offer.type === typeFilterVal) {
-        i += 1;
+      if (!checkField(elem.offer.rooms, filterRoomsVal)) {
+        return false;
       }
-
-      if (roomsFilterVal === 'any') {
-        i += 1;
-      } else if (elem.offer.rooms === +roomsFilterVal) {
-        i += 1;
+      if (!checkField(elem.offer.guests, filterGuestsVal)) {
+        return false;
       }
-
-      if (guestsFilterVal === 'any') {
-        i += 1;
-      } else if (elem.offer.guests === +guestsFilterVal) {
-        i += 1;
+      if (!checkPrice(elem.offer.price, filterPriceVal)) {
+        return false;
       }
-
-      if (priceFilterVal === 'any') {
-        i += 1;
-      } else if (priceFilterVal === 'low' && elem.offer.price < 10000) {
-        i += 1;
-      } else if (priceFilterVal === 'middle' && elem.offer.price >= 10000 && elem.offer.price < 50000) {
-        i += 1;
-      } else if (priceFilterVal === 'high' && elem.offer.price >= 50000) {
-        i += 1;
+      if (!checkFeature(elem.offer.features, filterFeatures)) {
+        return false;
       }
-
-      if (i === 5) {
-        return true;
-      }
-      return false;
+      return true;
 
     });
 
