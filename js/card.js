@@ -4,8 +4,8 @@
 
   var OFFER_TYPES_TRANSLATED = {
     palace: 'Дворец',
-    flat: 'Дом',
-    house: 'Квартира',
+    flat: 'Квартира',
+    house: 'Дом',
     bungalo: 'Лачуга'
   };
 

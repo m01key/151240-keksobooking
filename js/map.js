@@ -6,31 +6,107 @@
   var PIN_MIN_Y = 150;
   var PIN_MAX_Y = 500;
 
+  var DEBOUNCE_TIME = 500;
+
+  var OFFERS_AMOUNT = 5;
+
   var mapElement = document.querySelector('.map');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
+  var mapFilters = mapElement.querySelector('.map__filters');
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
+  var offersData;
+  var timerId;
 
 
-  function onLoadSuccess(data) {
-    var fragment = document.createDocumentFragment();
-    for (var i = 0; i < data.length; i++) {
-      fragment.appendChild(window.pin.create(data[i]));
+  function debounce(callback, data) {
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
     }
-    mapPinsElement.appendChild(fragment);
+    timerId = setTimeout(function () {
+      callback(data);
+    }, DEBOUNCE_TIME);
   }
 
-  function onError(message) {
-    var messageElement = document.createElement('div');
-    messageElement.classList.add('error-mesage');
-    messageElement.textContent = message;
-    document.body.insertAdjacentElement('afterbegin', messageElement);
+  function isContainCheckedFeature(offerFeatures, filterFeatures) {
+    var filterFeaturesChecked = [].filter.call(filterFeatures, function (elem) {
+      return elem.checked;
+    });
+    for (var i = 0; i < filterFeaturesChecked.length; i++) {
+      if (offerFeatures.indexOf(filterFeaturesChecked[i].value) === -1) {
+        return false;
+      }
+    }
+    return true;
+  }
 
-    setTimeout(function () {
-      messageElement.parentElement.removeChild(messageElement);
-    }, 3000);
+  function onFilterChange() {
+    var typeFilterVal = mapFilters.elements['housing-type'].value;
+    var priceFilterVal = mapFilters.elements['housing-price'].value;
+    var roomsFilterVal = mapFilters.elements['housing-rooms'].value;
+    var guestsFilterVal = mapFilters.elements['housing-guests'].value;
+    var featuresFilter = mapFilters.elements['features'];
+
+    var offersFiltered = offersData.filter(function (elem) {
+
+      var i = 0;
+
+      if (isContainCheckedFeature(elem.offer.features, featuresFilter)) {
+        i += 1;
+      }
+
+      if (typeFilterVal === 'any') {
+        i += 1;
+      } else if (elem.offer.type === typeFilterVal) {
+        i += 1;
+      }
+
+      if (roomsFilterVal === 'any') {
+        i += 1;
+      } else if (elem.offer.rooms === +roomsFilterVal) {
+        i += 1;
+      }
+
+      if (guestsFilterVal === 'any') {
+        i += 1;
+      } else if (elem.offer.guests === +guestsFilterVal) {
+        i += 1;
+      }
+
+      if (priceFilterVal === 'any') {
+        i += 1;
+      } else if (priceFilterVal === 'low' && elem.offer.price < 10000) {
+        i += 1;
+      } else if (priceFilterVal === 'middle' && elem.offer.price >= 10000 && elem.offer.price < 50000) {
+        i += 1;
+      } else if (priceFilterVal === 'high' && elem.offer.price >= 50000) {
+        i += 1;
+      }
+
+      if (i === 5) {
+        return true;
+      }
+      return false;
+
+    });
+
+    window.card.close();
+    debounce(renderPins, offersFiltered);
+  }
+
+  mapFilters.addEventListener('change', onFilterChange);
+
+  function renderPins(data) {
+    var fragment = document.createDocumentFragment();
+    var length = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
+    for (var i = 0; i < length; i++) {
+      fragment.appendChild(window.pin.create(data[i]));
+    }
+    mapPinsElement.innerHTML = '';
+    mapPinsElement.appendChild(fragment);
   }
 
   function getCoordsPinMain(center) {
@@ -50,6 +126,24 @@
     addressElement.value = getCoordsPinMain();
     window.backend.load(onLoadSuccess, onError);
     window.map.isActive = true;
+  }
+
+  function onError(message) {
+    var messageElement = document.createElement('div');
+    messageElement.classList.add('error-mesage');
+    messageElement.textContent = message;
+    document.body.insertAdjacentElement('afterbegin', messageElement);
+
+    setTimeout(function () {
+      messageElement.parentElement.removeChild(messageElement);
+    }, 3000);
+  }
+
+  function onLoadSuccess(data) {
+    offersData = data;
+    renderPins(offersData);
+
+    // console.log(offersData);
   }
 
   function onPinMainMouseDown(e) {
