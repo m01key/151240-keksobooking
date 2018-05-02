@@ -13,7 +13,7 @@
   var mapElement = document.querySelector('.map');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
-  var mapFilters = mapElement.querySelector('.map__filters');
+  var mapFiltersElement = mapElement.querySelector('.map__filters');
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
@@ -44,13 +44,20 @@
   }
 
   function renderPins(data) {
+    clearPins();
     var fragment = document.createDocumentFragment();
     var length = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
     for (var i = 0; i < length; i++) {
       fragment.appendChild(window.pin.create(data[i]));
     }
-    mapPinsElement.innerHTML = '';
     mapPinsElement.appendChild(fragment);
+  }
+
+  function clearPins() {
+    var mapPinElements = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
+    [].forEach.call(mapPinElements, function (elem) {
+      elem.parentElement.removeChild(elem);
+    });
   }
 
   function getCoordsPinMain(center) {
@@ -73,11 +80,11 @@
   }
 
   function onFilterChange() {
-    var typeFilterVal = mapFilters.elements['housing-type'].value;
-    var priceFilterVal = mapFilters.elements['housing-price'].value;
-    var roomsFilterVal = mapFilters.elements['housing-rooms'].value;
-    var guestsFilterVal = mapFilters.elements['housing-guests'].value;
-    var featuresFilter = mapFilters.elements['features'];
+    var typeFilterVal = mapFiltersElement.elements['housing-type'].value;
+    var priceFilterVal = mapFiltersElement.elements['housing-price'].value;
+    var roomsFilterVal = mapFiltersElement.elements['housing-rooms'].value;
+    var guestsFilterVal = mapFiltersElement.elements['housing-guests'].value;
+    var featuresFilter = mapFiltersElement.elements['features'];
 
     var offersFiltered = offersData.filter(function (elem) {
 
@@ -196,7 +203,7 @@
   }
 
 
-  mapFilters.addEventListener('change', onFilterChange);
+  mapFiltersElement.addEventListener('change', onFilterChange);
   mapPinMainElement.addEventListener('mousedown', onPinMainMouseDown);
 
 
