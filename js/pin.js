@@ -2,6 +2,8 @@
 
 (function () {
 
+  var KEY_ENTER = 13;
+
   var Pin = {
     WIDTH: 50,
     HEIGHT: 70
@@ -21,6 +23,12 @@
     pinImgElement.addEventListener('click', function () {
       window.card.close();
       window.card.show(data);
+    });
+    pinElement.addEventListener('keydown', function (e) {
+      if (e.keyCode === KEY_ENTER) {
+        window.card.close();
+        window.card.show(data);
+      }
     });
 
     return pinElement;

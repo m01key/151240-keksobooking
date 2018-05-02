@@ -2,6 +2,8 @@
 
 (function () {
 
+  var KEY_ESC = 27;
+
   var engToRus = {
     palace: 'Дворец',
     flat: 'Квартира',
@@ -16,6 +18,12 @@
   function onCardCrossClick(e) {
     var cardElement = e.target.closest('.map__card');
     closeCard(cardElement);
+  }
+
+  function onEscKeyDown(e) {
+    if (e.keyCode === KEY_ESC) {
+      window.card.close();
+    }
   }
 
   function createCard(offerData) {
@@ -57,6 +65,7 @@
   function showCard(offerData) {
     var cardElement = createCard(offerData);
     mapFiltersElement.parentElement.insertBefore(cardElement, mapFiltersElement);
+    document.addEventListener('keydown', onEscKeyDown);
   }
 
   function closeCard() {
@@ -64,6 +73,7 @@
     if (mapCardElement) {
       mapCardElement.parentElement.removeChild(mapCardElement);
     }
+    document.removeEventListener('keydown', onEscKeyDown);
   }
 
 
