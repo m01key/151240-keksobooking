@@ -74,16 +74,10 @@
   }
 
   function checkPrice(offerVal, filterVal) {
-    if (filterVal === 'any') {
-      return true;
-    }
-    if (filterVal === 'low' && offerVal < 10000) {
-      return true;
-    }
-    if (filterVal === 'middle' && offerVal >= 10000 && offerVal < 50000) {
-      return true;
-    }
-    if (filterVal === 'high' && offerVal >= 50000) {
+    if (filterVal === 'any' ||
+      filterVal === 'low' && offerVal < 10000 ||
+      filterVal === 'middle' && offerVal >= 10000 && offerVal < 50000 ||
+      filterVal === 'high' && offerVal >= 50000) {
       return true;
     }
     return false;
@@ -115,30 +109,15 @@
   }
 
   function onFilterChange() {
-    var filterTypeVal = filterTypeElement.value;
-    var filterRoomsVal = filterRoomsElement.value;
-    var filterGuestsVal = filterGuestsElement.value;
-    var filterPriceVal = filterPriceElement.value;
-
     var offersFiltered = offersData.filter(function (elem) {
-
-      if (!checkField(elem.offer.type, filterTypeVal)) {
-        return false;
+      if (checkField(elem.offer.type, filterTypeElement.value) &&
+        checkField(elem.offer.rooms, filterRoomsElement.value) &&
+        checkField(elem.offer.guests, filterGuestsElement.value) &&
+        checkPrice(elem.offer.price, filterPriceElement.value) &&
+        checkFeature(elem.offer.features, filterFeatures)) {
+        return true;
       }
-      if (!checkField(elem.offer.rooms, filterRoomsVal)) {
-        return false;
-      }
-      if (!checkField(elem.offer.guests, filterGuestsVal)) {
-        return false;
-      }
-      if (!checkPrice(elem.offer.price, filterPriceVal)) {
-        return false;
-      }
-      if (!checkFeature(elem.offer.features, filterFeatures)) {
-        return false;
-      }
-      return true;
-
+      return false;
     });
 
     window.card.close();
