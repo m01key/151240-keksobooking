@@ -43,6 +43,35 @@
     return true;
   }
 
+  function renderPins(data) {
+    var fragment = document.createDocumentFragment();
+    var length = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
+    for (var i = 0; i < length; i++) {
+      fragment.appendChild(window.pin.create(data[i]));
+    }
+    mapPinsElement.innerHTML = '';
+    mapPinsElement.appendChild(fragment);
+  }
+
+  function getCoordsPinMain(center) {
+    var shift = center === 'center' ? 2 : 1;
+    var left = parseInt(mapPinMainElement.offsetLeft, 10) + PIN_MAIN_SIZE / 2;
+    var top = parseInt(mapPinMainElement.offsetTop, 10) + PIN_MAIN_SIZE / shift;
+
+    return left + ', ' + top;
+  }
+
+  function activateSite() {
+    mapElement.classList.remove('map--faded');
+    formElement.classList.remove('ad-form--disabled');
+    for (var i = 0; i < fieldsetElements.length; i++) {
+      fieldsetElements[i].disabled = false;
+    }
+    addressElement.value = getCoordsPinMain();
+    window.backend.load(onLoadSuccess, onError);
+    window.map.isActive = true;
+  }
+
   function onFilterChange() {
     var typeFilterVal = mapFilters.elements['housing-type'].value;
     var priceFilterVal = mapFilters.elements['housing-price'].value;
@@ -97,37 +126,6 @@
     debounce(renderPins, offersFiltered);
   }
 
-  mapFilters.addEventListener('change', onFilterChange);
-
-  function renderPins(data) {
-    var fragment = document.createDocumentFragment();
-    var length = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
-    for (var i = 0; i < length; i++) {
-      fragment.appendChild(window.pin.create(data[i]));
-    }
-    mapPinsElement.innerHTML = '';
-    mapPinsElement.appendChild(fragment);
-  }
-
-  function getCoordsPinMain(center) {
-    var shift = center === 'center' ? 2 : 1;
-    var left = parseInt(mapPinMainElement.offsetLeft, 10) + PIN_MAIN_SIZE / 2;
-    var top = parseInt(mapPinMainElement.offsetTop, 10) + PIN_MAIN_SIZE / shift;
-
-    return left + ', ' + top;
-  }
-
-  function activateSite() {
-    mapElement.classList.remove('map--faded');
-    formElement.classList.remove('ad-form--disabled');
-    for (var i = 0; i < fieldsetElements.length; i++) {
-      fieldsetElements[i].disabled = false;
-    }
-    addressElement.value = getCoordsPinMain();
-    window.backend.load(onLoadSuccess, onError);
-    window.map.isActive = true;
-  }
-
   function onError(message) {
     var messageElement = document.createElement('div');
     messageElement.classList.add('error-mesage');
@@ -142,8 +140,6 @@
   function onLoadSuccess(data) {
     offersData = data;
     renderPins(offersData);
-
-    // console.log(offersData);
   }
 
   function onPinMainMouseDown(e) {
@@ -200,6 +196,7 @@
   }
 
 
+  mapFilters.addEventListener('change', onFilterChange);
   mapPinMainElement.addEventListener('mousedown', onPinMainMouseDown);
 
 
