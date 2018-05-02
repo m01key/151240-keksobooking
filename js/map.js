@@ -6,31 +6,51 @@
   var PIN_MIN_Y = 150;
   var PIN_MAX_Y = 500;
 
+  var DEBOUNCE_TIME = 500;
+
+  var OFFERS_AMOUNT = 5;
+
   var mapElement = document.querySelector('.map');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
+  var mapFiltersElement = mapElement.querySelector('.map__filters');
+  var filterTypeElement = mapFiltersElement.elements['housing-type'];
+  var filterPriceElement = mapFiltersElement.elements['housing-price'];
+  var filterRoomsElement = mapFiltersElement.elements['housing-rooms'];
+  var filterGuestsElement = mapFiltersElement.elements['housing-guests'];
+  var filterFeatures = mapFiltersElement.elements['features'];
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
+  var offersData;
+  var timerId;
 
 
-  function onLoadSuccess(data) {
+  function debounce(callback, data) {
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+    timerId = setTimeout(function () {
+      callback(data);
+    }, DEBOUNCE_TIME);
+  }
+
+  function renderPins(data) {
+    clearPins();
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < data.length; i++) {
+    var length = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
+    for (var i = 0; i < length; i++) {
       fragment.appendChild(window.pin.create(data[i]));
     }
     mapPinsElement.appendChild(fragment);
   }
 
-  function onError(message) {
-    var messageElement = document.createElement('div');
-    messageElement.classList.add('error-mesage');
-    messageElement.textContent = message;
-    document.body.insertAdjacentElement('afterbegin', messageElement);
-
-    setTimeout(function () {
-      messageElement.parentElement.removeChild(messageElement);
-    }, 3000);
+  function clearPins() {
+    var mapPinElements = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
+    [].forEach.call(mapPinElements, function (elem) {
+      elem.parentElement.removeChild(elem);
+    });
   }
 
   function getCoordsPinMain(center) {
@@ -50,6 +70,61 @@
     addressElement.value = getCoordsPinMain();
     window.backend.load(onLoadSuccess, onError);
     window.map.isActive = true;
+  }
+
+  function checkPrice(offerVal, filterVal) {
+    return filterVal === 'any' ||
+      filterVal === 'low' && offerVal < 10000 ||
+      filterVal === 'middle' && offerVal >= 10000 && offerVal < 50000 ||
+      filterVal === 'high' && offerVal >= 50000;
+  }
+
+  function checkField(offerVal, filterVal) {
+    var transformed = parseInt(filterVal, 10);
+    filterVal = isNaN(transformed) ? filterVal : transformed;
+
+    return filterVal === 'any' || filterVal === offerVal;
+  }
+
+  function checkFeature(offerValArr, filterValArr) {
+    var filterCheckedArr = [].filter.call(filterValArr, function (elem) {
+      return elem.checked;
+    });
+    for (var i = 0; i < filterCheckedArr.length; i++) {
+      if (offerValArr.indexOf(filterCheckedArr[i].value) === -1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function onFilterChange() {
+    var offersFiltered = offersData.filter(function (elem) {
+      return checkField(elem.offer.type, filterTypeElement.value) &&
+        checkField(elem.offer.rooms, filterRoomsElement.value) &&
+        checkField(elem.offer.guests, filterGuestsElement.value) &&
+        checkPrice(elem.offer.price, filterPriceElement.value) &&
+        checkFeature(elem.offer.features, filterFeatures);
+    });
+
+    window.card.close();
+    debounce(renderPins, offersFiltered);
+  }
+
+  function onError(message) {
+    var messageElement = document.createElement('div');
+    messageElement.classList.add('error-mesage');
+    messageElement.textContent = message;
+    document.body.insertAdjacentElement('afterbegin', messageElement);
+
+    setTimeout(function () {
+      messageElement.parentElement.removeChild(messageElement);
+    }, 3000);
+  }
+
+  function onLoadSuccess(data) {
+    offersData = data;
+    renderPins(offersData);
   }
 
   function onPinMainMouseDown(e) {
@@ -106,6 +181,7 @@
   }
 
 
+  mapFiltersElement.addEventListener('change', onFilterChange);
   mapPinMainElement.addEventListener('mousedown', onPinMainMouseDown);
 
 

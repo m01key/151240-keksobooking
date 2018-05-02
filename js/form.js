@@ -4,6 +4,7 @@
 
   var notification = document.querySelector('.success');
   var mapElement = document.querySelector('.map');
+  var mapFiltersElement = mapElement.querySelector('.map__filters');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
   var formElement = document.querySelector('.ad-form');
@@ -38,6 +39,7 @@
     for (var i = 1; i < pins.length; i++) {
       mapPinsElement.removeChild(pins[i]);
     }
+    mapFiltersElement.reset();
     disableForm();
     window.map.isActive = false;
   }
