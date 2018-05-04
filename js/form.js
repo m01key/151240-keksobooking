@@ -22,9 +22,9 @@
 
 
   function disableForm() {
-    for (var i = 0; i < fieldsetElements.length; i++) {
-      fieldsetElements[i].disabled = true;
-    }
+    fieldsetElements.forEach(function (elem) {
+      elem.disabled = true;
+    });
     formElement.reset();
     addressElement.value = window.map.getCoordsPinMain();
   }
@@ -36,9 +36,9 @@
     mapPinMainElement.style.left = pinMainLeft + 'px';
     mapPinMainElement.style.top = pinMainTop + 'px';
     window.card.close();
-    for (var i = 1; i < pins.length; i++) {
-      mapPinsElement.removeChild(pins[i]);
-    }
+    pins.forEach(function (elem) {
+      mapPinsElement.removeChild(elem);
+    });
     mapFiltersElement.reset();
     disableForm();
     window.map.isActive = false;

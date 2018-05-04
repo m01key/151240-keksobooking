@@ -10,6 +10,11 @@
 
   var OFFERS_AMOUNT = 5;
 
+  var PRICE_MIN = 10000;
+  var PRICE_MAX = 50000;
+
+  var ERROR_TIME = 3000;
+
   var mapElement = document.querySelector('.map');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
@@ -27,10 +32,7 @@
 
 
   function debounce(callback, data) {
-    if (timerId) {
-      clearTimeout(timerId);
-      timerId = null;
-    }
+    clearTimeout(timerId);
     timerId = setTimeout(function () {
       callback(data);
     }, DEBOUNCE_TIME);
@@ -39,8 +41,8 @@
   function renderPins(data) {
     clearPins();
     var fragment = document.createDocumentFragment();
-    var length = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
-    for (var i = 0; i < length; i++) {
+    var offersAmount = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
+    for (var i = 0; i < offersAmount; i++) {
       fragment.appendChild(window.pin.create(data[i]));
     }
     mapPinsElement.appendChild(fragment);
@@ -48,7 +50,7 @@
 
   function clearPins() {
     var mapPinElements = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
-    [].forEach.call(mapPinElements, function (elem) {
+    mapPinElements.forEach(function (elem) {
       elem.parentElement.removeChild(elem);
     });
   }
@@ -64,9 +66,9 @@
   function activateSite() {
     mapElement.classList.remove('map--faded');
     formElement.classList.remove('ad-form--disabled');
-    for (var i = 0; i < fieldsetElements.length; i++) {
-      fieldsetElements[i].disabled = false;
-    }
+    fieldsetElements.forEach(function (elem) {
+      elem.disabled = false;
+    });
     addressElement.value = getCoordsPinMain();
     window.backend.load(onLoadSuccess, onError);
     window.map.isActive = true;
@@ -74,9 +76,9 @@
 
   function checkPrice(offerVal, filterVal) {
     return filterVal === 'any' ||
-      filterVal === 'low' && offerVal < 10000 ||
-      filterVal === 'middle' && offerVal >= 10000 && offerVal < 50000 ||
-      filterVal === 'high' && offerVal >= 50000;
+      filterVal === 'low' && offerVal < PRICE_MIN ||
+      filterVal === 'middle' && offerVal >= PRICE_MIN && offerVal < PRICE_MAX ||
+      filterVal === 'high' && offerVal >= PRICE_MAX;
   }
 
   function checkField(offerVal, filterVal) {
@@ -119,7 +121,7 @@
 
     setTimeout(function () {
       messageElement.parentElement.removeChild(messageElement);
-    }, 3000);
+    }, ERROR_TIME);
   }
 
   function onLoadSuccess(data) {
