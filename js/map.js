@@ -2,17 +2,16 @@
 
 (function () {
 
+  var Price = {
+    MIN: 10000,
+    MAX: 50000
+  };
+
   var PIN_MAIN_SIZE = 65;
   var PIN_MIN_Y = 150;
   var PIN_MAX_Y = 500;
-
   var DEBOUNCE_TIME = 500;
-
   var OFFERS_AMOUNT = 5;
-
-  var PRICE_MIN = 10000;
-  var PRICE_MAX = 50000;
-
   var ERROR_TIME = 3000;
 
   var mapElement = document.querySelector('.map');
@@ -76,9 +75,9 @@
 
   function checkPrice(offerVal, filterVal) {
     return filterVal === 'any' ||
-      filterVal === 'low' && offerVal < PRICE_MIN ||
-      filterVal === 'middle' && offerVal >= PRICE_MIN && offerVal < PRICE_MAX ||
-      filterVal === 'high' && offerVal >= PRICE_MAX;
+      filterVal === 'low' && offerVal < Price.MIN ||
+      filterVal === 'middle' && offerVal >= Price.MIN && offerVal < Price.MAX ||
+      filterVal === 'high' && offerVal >= Price.MAX;
   }
 
   function checkField(offerVal, filterVal) {

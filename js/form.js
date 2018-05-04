@@ -2,6 +2,15 @@
 
 (function () {
 
+  var PriceMin = {
+    BUNGALO: 0,
+    FLAT: 1000,
+    HOUSE: 5000,
+    PALACE: 10000
+  };
+
+  var NOTIFICATION_TIME = 3000;
+
   var notification = document.querySelector('.success');
   var mapElement = document.querySelector('.map');
   var mapFiltersElement = mapElement.querySelector('.map__filters');
@@ -70,7 +79,7 @@
 
     setTimeout(function () {
       notification.classList.add('hidden');
-    }, 3000);
+    }, NOTIFICATION_TIME);
   }
 
   function onFormSubmit(e) {
@@ -102,20 +111,20 @@
   function onTypeChange() {
     switch (typeElement.value) {
       case 'bungalo':
-        priceElement.min = 0;
-        priceElement.placeholder = 0;
+        priceElement.min = PriceMin.BUNGALO;
+        priceElement.placeholder = PriceMin.BUNGALO;
         break;
       case 'flat':
-        priceElement.min = 1000;
-        priceElement.placeholder = 1000;
+        priceElement.min = PriceMin.FLAT;
+        priceElement.placeholder = PriceMin.FLAT;
         break;
       case 'house':
-        priceElement.min = 5000;
-        priceElement.placeholder = 5000;
+        priceElement.min = PriceMin.HOUSE;
+        priceElement.placeholder = PriceMin.HOUSE;
         break;
       default:
-        priceElement.min = 10000;
-        priceElement.placeholder = 10000;
+        priceElement.min = PriceMin.PALACE;
+        priceElement.placeholder = PriceMin.PALACE;
     }
   }
 

@@ -3,8 +3,12 @@
 (function () {
 
   var TIMEOUT = 5000;
-  var STATUS_SUCCESS_MIN = 200;
-  var STATUS_SUCCESS_MAX = 308;
+
+  var Status = {
+    SUCCESS_MIN: 200,
+    SUCCESS_MAX: 308
+  };
+
 
   function load(onLoad, onError) {
     var URL = 'https://js.dump.academy/keksobooking/data';
@@ -13,7 +17,7 @@
     xhr.timeout = TIMEOUT;
 
     xhr.addEventListener('load', function () {
-      if (xhr.status >= STATUS_SUCCESS_MIN && xhr.status <= STATUS_SUCCESS_MAX) {
+      if (xhr.status >= Status.SUCCESS_MIN && xhr.status <= Status.SUCCESS_MAX) {
         try {
           var dataOffers = JSON.parse(xhr.responseText);
           onLoad(dataOffers);
@@ -43,7 +47,7 @@
     xhr.timeout = TIMEOUT;
 
     xhr.addEventListener('load', function () {
-      if (xhr.status >= STATUS_SUCCESS_MIN && xhr.status <= STATUS_SUCCESS_MAX) {
+      if (xhr.status >= Status.SUCCESS_MIN && xhr.status <= Status.SUCCESS_MAX) {
         onLoad();
       } else {
         onError('Произошла ошибка при публикации объявления: ' + xhr.status + ' ' + xhr.statusText);

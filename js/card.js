@@ -2,6 +2,11 @@
 
 (function () {
 
+  var Photo = {
+    WIDTH: 45,
+    HEIGHT: 40
+  };
+
   var KEY_ESC = 27;
 
   var offerTypesTranslated = {
@@ -51,8 +56,8 @@
       var imgElement = document.createElement('img');
       imgElement.src = elem;
       imgElement.alt = 'Фотография жилья';
-      imgElement.width = 45;
-      imgElement.height = 40;
+      imgElement.width = Photo.WIDTH;
+      imgElement.height = Photo.HEIGHT;
       imgElement.classList.add('popup__photo');
       photoElement.appendChild(imgElement);
     });

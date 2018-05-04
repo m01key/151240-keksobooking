@@ -2,12 +2,12 @@
 
 (function () {
 
-  var KEY_ENTER = 13;
-
   var Pin = {
     WIDTH: 50,
     HEIGHT: 70
   };
+
+  var KEY_ENTER = 13;
 
   var pinTemplateElement = document.querySelector('template').content.querySelector('.map__pin');
 
