@@ -20,7 +20,7 @@
     pinElement.style.top = (data.location.y - Pin.HEIGHT) + 'px';
     pinImgElement.src = data.author.avatar;
     pinImgElement.alt = data.offer.title;
-    pinImgElement.addEventListener('click', function () {
+    pinElement.addEventListener('click', function () {
       window.card.close();
       window.card.show(data);
     });

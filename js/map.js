@@ -5,10 +5,20 @@
   var PIN_MAIN_SIZE = 65;
   var PIN_MIN_Y = 150;
   var PIN_MAX_Y = 500;
-
   var DEBOUNCE_TIME = 500;
-
   var OFFERS_AMOUNT = 5;
+  var ERROR_TIME = 3000;
+
+  var Pin = {
+    MAX_TOP: PIN_MAX_Y - PIN_MAIN_SIZE,
+    MIN_TOP: PIN_MIN_Y - PIN_MAIN_SIZE,
+    MIN_LEFT: 0
+  };
+
+  var Price = {
+    MIN: 10000,
+    MAX: 50000
+  };
 
   var mapElement = document.querySelector('.map');
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
@@ -27,10 +37,7 @@
 
 
   function debounce(callback, data) {
-    if (timerId) {
-      clearTimeout(timerId);
-      timerId = null;
-    }
+    clearTimeout(timerId);
     timerId = setTimeout(function () {
       callback(data);
     }, DEBOUNCE_TIME);
@@ -39,17 +46,17 @@
   function renderPins(data) {
     clearPins();
     var fragment = document.createDocumentFragment();
-    var length = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
-    for (var i = 0; i < length; i++) {
+    var offersAmount = data.length > OFFERS_AMOUNT ? OFFERS_AMOUNT : data.length;
+    for (var i = 0; i < offersAmount; i++) {
       fragment.appendChild(window.pin.create(data[i]));
     }
     mapPinsElement.appendChild(fragment);
   }
 
   function clearPins() {
-    var mapPinElements = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
-    [].forEach.call(mapPinElements, function (elem) {
-      elem.parentElement.removeChild(elem);
+    var mapPinElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    mapPinElements.forEach(function (it) {
+      it.parentElement.removeChild(it);
     });
   }
 
@@ -64,34 +71,34 @@
   function activateSite() {
     mapElement.classList.remove('map--faded');
     formElement.classList.remove('ad-form--disabled');
-    for (var i = 0; i < fieldsetElements.length; i++) {
-      fieldsetElements[i].disabled = false;
-    }
+    fieldsetElements.forEach(function (it) {
+      it.disabled = false;
+    });
     addressElement.value = getCoordsPinMain();
-    window.backend.load(onLoadSuccess, onError);
+    window.backend.load(onLoad, onError);
     window.map.isActive = true;
   }
 
-  function checkPrice(offerVal, filterVal) {
-    return filterVal === 'any' ||
-      filterVal === 'low' && offerVal < 10000 ||
-      filterVal === 'middle' && offerVal >= 10000 && offerVal < 50000 ||
-      filterVal === 'high' && offerVal >= 50000;
+  function checkPrice(offerValue, filterValue) {
+    return filterValue === 'any' ||
+      filterValue === 'low' && offerValue < Price.MIN ||
+      filterValue === 'middle' && offerValue >= Price.MIN && offerValue < Price.MAX ||
+      filterValue === 'high' && offerValue >= Price.MAX;
   }
 
-  function checkField(offerVal, filterVal) {
-    var transformed = parseInt(filterVal, 10);
-    filterVal = isNaN(transformed) ? filterVal : transformed;
+  function checkField(offerValue, filterValue) {
+    var transformed = parseInt(filterValue, 10);
+    filterValue = isNaN(transformed) ? filterValue : transformed;
 
-    return filterVal === 'any' || filterVal === offerVal;
+    return filterValue === 'any' || filterValue === offerValue;
   }
 
-  function checkFeature(offerValArr, filterValArr) {
-    var filterCheckedArr = [].filter.call(filterValArr, function (elem) {
-      return elem.checked;
+  function checkFeature(offerValueArr, filterValueArr) {
+    var filterCheckedArr = [].filter.call(filterValueArr, function (it) {
+      return it.checked;
     });
     for (var i = 0; i < filterCheckedArr.length; i++) {
-      if (offerValArr.indexOf(filterCheckedArr[i].value) === -1) {
+      if (offerValueArr.indexOf(filterCheckedArr[i].value) === -1) {
         return false;
       }
     }
@@ -99,12 +106,12 @@
   }
 
   function onFilterChange() {
-    var offersFiltered = offersData.filter(function (elem) {
-      return checkField(elem.offer.type, filterTypeElement.value) &&
-        checkField(elem.offer.rooms, filterRoomsElement.value) &&
-        checkField(elem.offer.guests, filterGuestsElement.value) &&
-        checkPrice(elem.offer.price, filterPriceElement.value) &&
-        checkFeature(elem.offer.features, filterFeatures);
+    var offersFiltered = offersData.filter(function (it) {
+      return checkField(it.offer.type, filterTypeElement.value) &&
+        checkField(it.offer.rooms, filterRoomsElement.value) &&
+        checkField(it.offer.guests, filterGuestsElement.value) &&
+        checkPrice(it.offer.price, filterPriceElement.value) &&
+        checkFeature(it.offer.features, filterFeatures);
     });
 
     window.card.close();
@@ -119,19 +126,16 @@
 
     setTimeout(function () {
       messageElement.parentElement.removeChild(messageElement);
-    }, 3000);
+    }, ERROR_TIME);
   }
 
-  function onLoadSuccess(data) {
+  function onLoad(data) {
     offersData = data;
     renderPins(offersData);
   }
 
   function onPinMainMouseDown(e) {
     var maxLeft = mapElement.offsetWidth - PIN_MAIN_SIZE;
-    var minLeft = 0;
-    var maxTop = PIN_MAX_Y - PIN_MAIN_SIZE;
-    var minTop = PIN_MIN_Y - PIN_MAIN_SIZE;
 
     var startX = e.clientX;
     var startY = e.clientY;
@@ -146,16 +150,16 @@
       var newLeft = mapPinMainElement.offsetLeft + shiftLeft;
       var newTop = mapPinMainElement.offsetTop + shiftTop;
 
-      if (newLeft < minLeft) {
-        newLeft = minLeft;
+      if (newLeft < Pin.MIN_LEFT) {
+        newLeft = Pin.MIN_LEFT;
       } else if (newLeft > maxLeft) {
         newLeft = maxLeft;
       }
 
-      if (newTop < minTop) {
-        newTop = minTop;
-      } else if (newTop > maxTop) {
-        newTop = maxTop;
+      if (newTop < Pin.MIN_TOP) {
+        newTop = Pin.MIN_TOP;
+      } else if (newTop > Pin.MAX_TOP) {
+        newTop = Pin.MAX_TOP;
       }
 
       mapPinMainElement.style.left = newLeft + 'px';
@@ -187,6 +191,7 @@
 
   window.map = {
     getCoordsPinMain: getCoordsPinMain,
+    clearPins: clearPins,
     onError: onError,
     isActive: false
   };
