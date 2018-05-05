@@ -2,6 +2,9 @@
 
 (function () {
 
+  var NOTIFICATION_TIME = 3000;
+  var FILE_TYPE = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
+
   var PriceMin = {
     BUNGALO: 0,
     FLAT: 1000,
@@ -13,9 +16,6 @@
     WIDTH: 70,
     HEIGHT: 70
   };
-
-  var NOTIFICATION_TIME = 3000;
-  var FILE_TYPE = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 
   var notification = document.querySelector('.success');
   var mapElement = document.querySelector('.map');
@@ -48,8 +48,8 @@
 
 
   function disableForm() {
-    fieldsetElements.forEach(function (elem) {
-      elem.disabled = true;
+    fieldsetElements.forEach(function (it) {
+      it.disabled = true;
     });
     formElement.reset();
     addressElement.value = window.map.getCoordsPinMain();
@@ -63,9 +63,9 @@
 
     avatarPreviewElement.src = avatarSource;
     var photoPreviewElements = formElement.querySelectorAll('.ad-form__photo');
-    photoPreviewElements.forEach(function (elem, i, array) {
-      if (i !== array.length - 1) {
-        elem.parentElement.removeChild(elem);
+    photoPreviewElements.forEach(function (it, i, arr) {
+      if (i !== arr.length - 1) {
+        it.parentElement.removeChild(it);
       }
     });
 
@@ -98,7 +98,11 @@
   }
 
 
-  function onElementChange() {
+  function onGuestsChange() {
+    checkValidity();
+  }
+
+  function onRoomsChange() {
     checkValidity();
   }
 
@@ -134,7 +138,7 @@
     e.preventDefault();
 
     var formData = new FormData(formElement);
-    window.backend.upload(formData, onUploadSuccess, window.map.onError);
+    window.backend.upload(formData, onUpload, window.map.onError);
     window.map.isActive = false;
   }
 
@@ -144,7 +148,7 @@
     deactivateSite();
   }
 
-  function onUploadSuccess() {
+  function onUpload() {
     deactivateSite();
     notification.classList.remove('hidden');
 
@@ -158,8 +162,8 @@
     if (!file) {
       return false;
     }
-    return FILE_TYPE.some(function (elem) {
-      return elem === file.type;
+    return FILE_TYPE.some(function (it) {
+      return it === file.type;
     });
   }
 
@@ -262,8 +266,8 @@
   avatarDropZone.addEventListener('dragover', onAvatarDragover);
   avatarDropZone.addEventListener('drop', onAvatarDrop);
 
-  guestsElement.addEventListener('change', onElementChange);
-  roomsElement.addEventListener('change', onElementChange);
+  guestsElement.addEventListener('change', onGuestsChange);
+  roomsElement.addEventListener('change', onRoomsChange);
   timeinElement.addEventListener('change', onTimeinChange);
   timeoutElement.addEventListener('change', onTimeoutChange);
   typeElement.addEventListener('change', onTypeChange);

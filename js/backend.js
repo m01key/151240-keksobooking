@@ -2,12 +2,12 @@
 
 (function () {
 
+  var TIMEOUT = 5000;
+
   var Status = {
     SUCCESS_MIN: 200,
     SUCCESS_MAX: 308
   };
-
-  var TIMEOUT = 5000;
 
 
   function load(onLoad, onError) {
@@ -28,9 +28,11 @@
         onError('Произошла ошибка при загрузке объявлений: ' + xhr.status + ' ' + xhr.statusText);
       }
     });
+
     xhr.addEventListener('error', function () {
       onError('Произошла ошибка соединения');
     });
+
     xhr.addEventListener('timeout', function () {
       onError('Время ожидания отклика от сервера превысило допустимое значение: ' + (xhr.timeout / 1000) + ' секунд');
     });
@@ -53,9 +55,11 @@
         onError('Произошла ошибка при публикации объявления: ' + xhr.status + ' ' + xhr.statusText);
       }
     });
+
     xhr.addEventListener('error', function () {
       onError('Произошла ошибка соединения');
     });
+
     xhr.addEventListener('timeout', function () {
       onError('Время ожидания отклика от сервера превысило допустимое значение: ' + (xhr.timeout / 1000) + ' секунд');
     });

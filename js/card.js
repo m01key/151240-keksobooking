@@ -2,12 +2,12 @@
 
 (function () {
 
+  var KEY_ESC = 27;
+
   var Photo = {
     WIDTH: 45,
     HEIGHT: 40
   };
-
-  var KEY_ESC = 27;
 
   var offerTypesTranslated = {
     palace: 'Дворец',
@@ -20,7 +20,7 @@
   var mapFiltersElement = document.querySelector('.map__filters-container');
 
 
-  function onCardCrossClick(e) {
+  function onCloseCardClick(e) {
     var cardElement = e.target.closest('.map__card');
     closeCard(cardElement);
   }
@@ -45,16 +45,16 @@
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + offerData.offer.checkin + ', выезд до ' + offerData.offer.checkout;
     cardElement.querySelector('.popup__description').textContent = offerData.offer.description;
     featureElement.textContent = '';
-    offerData.offer.features.forEach(function (elem) {
+    offerData.offer.features.forEach(function (it) {
       var li = document.createElement('li');
       li.classList.add('popup__feature');
-      li.classList.add('popup__feature--' + elem);
+      li.classList.add('popup__feature--' + it);
       featureElement.appendChild(li);
     });
     photoElement.textContent = '';
-    offerData.offer.photos.forEach(function (elem) {
+    offerData.offer.photos.forEach(function (it) {
       var imgElement = document.createElement('img');
-      imgElement.src = elem;
+      imgElement.src = it;
       imgElement.alt = 'Фотография жилья';
       imgElement.width = Photo.WIDTH;
       imgElement.height = Photo.HEIGHT;
@@ -63,7 +63,7 @@
     });
 
     cardElement.querySelector('.popup__avatar').src = offerData.author.avatar;
-    closeCardElement.addEventListener('click', onCardCrossClick);
+    closeCardElement.addEventListener('click', onCloseCardClick);
 
     return cardElement;
   }
