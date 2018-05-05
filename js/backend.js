@@ -2,12 +2,12 @@
 
 (function () {
 
-  var TIMEOUT = 5000;
-
   var Status = {
     SUCCESS_MIN: 200,
     SUCCESS_MAX: 308
   };
+
+  var TIMEOUT = 5000;
 
 
   function load(onLoad, onError) {

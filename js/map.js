@@ -48,7 +48,7 @@
   }
 
   function clearPins() {
-    var mapPinElements = mapPinsElement.querySelectorAll('.map__pin:not(.map__pin--main)');
+    var mapPinElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
     mapPinElements.forEach(function (elem) {
       elem.parentElement.removeChild(elem);
     });
@@ -188,6 +188,7 @@
 
   window.map = {
     getCoordsPinMain: getCoordsPinMain,
+    clearPins: clearPins,
     onError: onError,
     isActive: false
   };
