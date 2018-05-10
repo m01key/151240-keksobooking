@@ -263,7 +263,9 @@
       var bounds = target.getBoundingClientRect();
       var side = (evt.clientX - bounds.left) / (bounds.right - bounds.left);
 
-      target = side > 0.5 ? target.nextSibling : target;
+      if (side > 0.5) {
+        target = target.nextSibling;
+      }
 
       target.parentElement.insertBefore(dragElement, target);
     }
