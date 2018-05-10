@@ -25,6 +25,7 @@
   var mapPinMainElement = mapElement.querySelector('.map__pin--main');
   var mapPinsElement = mapElement.querySelector('.map__pins');
   var mapFiltersElement = mapElement.querySelector('.map__filters');
+  var mapFeaturesElement = mapElement.querySelector('.map__features');
   var filterTypeElement = mapFiltersElement.elements['housing-type'];
   var filterPriceElement = mapFiltersElement.elements['housing-price'];
   var filterRoomsElement = mapFiltersElement.elements['housing-rooms'];
@@ -33,10 +34,9 @@
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
-  // var checkedFilterValues = null;
-  // var isIterated = false;
   var offersData;
   var timerId;
+  var checkedFilterValues = [];
 
 
   function debounce(callback, data) {
@@ -96,23 +96,18 @@
   }
 
   function checkFeature(offerValues, filterValues) {
-    // if (!isIterated) {
-    //   checkedFilterValues = [].filter.call(filterValues, function (it) {
-    //     return it.checked;
-    //   });
-    //   isIterated = true;
-    // }
-
     return [].every.call(filterValues, function (it) {
       return offerValues.indexOf(it.value) !== -1;
     });
   }
 
-  function onFilterChange() {
-    var checkedFilterValues = [].filter.call(filterFeatureElements, function (it) {
+  function onFeaturesChange() {
+    checkedFilterValues = [].filter.call(filterFeatureElements, function (it) {
       return it.checked;
     });
+  }
 
+  function onFilterChange() {
     var offersFiltered = offersData.filter(function (it) {
       return checkField(it.offer.type, filterTypeElement.value) &&
         checkField(it.offer.rooms, filterRoomsElement.value) &&
@@ -120,9 +115,6 @@
         checkPrice(it.offer.price, filterPriceElement.value) &&
         checkFeature(it.offer.features, checkedFilterValues);
     });
-
-    // checkedFilterValues = null;
-    // isIterated = false;
 
     window.card.close();
     debounce(renderPins, offersFiltered);
@@ -195,6 +187,7 @@
   }
 
 
+  mapFeaturesElement.addEventListener('change', onFeaturesChange);
   mapFiltersElement.addEventListener('change', onFilterChange);
   mapPinMainElement.addEventListener('mousedown', onPinMainMouseDown);
 
