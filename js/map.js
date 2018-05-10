@@ -33,6 +33,8 @@
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
+  var checkedFilterValues = null;
+  var isIterated = false;
   var offersData;
   var timerId;
 
@@ -94,8 +96,15 @@
   }
 
   function checkFeature(offerValues, filterValues) {
-    return [].every.call(filterValues, function (it) {
-      return !(it.checked && offerValues.indexOf(it.value) === -1);
+    if (!isIterated) {
+      checkedFilterValues = [].filter.call(filterValues, function (it) {
+        return it.checked;
+      });
+      isIterated = true;
+    }
+
+    return [].every.call(checkedFilterValues, function (it) {
+      return offerValues.indexOf(it.value) !== -1;
     });
   }
 
@@ -107,6 +116,9 @@
         checkPrice(it.offer.price, filterPriceElement.value) &&
         checkFeature(it.offer.features, filterFeatureElements);
     });
+
+    checkedFilterValues = null;
+    isIterated = false;
 
     window.card.close();
     debounce(renderPins, offersFiltered);
