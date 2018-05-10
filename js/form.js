@@ -6,8 +6,8 @@
   var FILE_TYPE = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 
   var Photo = {
-    WIDTH: 70,
-    HEIGHT: 70
+    WIDTH: 60,
+    HEIGHT: 60
   };
 
   var priceMin = {
@@ -45,6 +45,8 @@
 
   var pinMainLeft = mapPinMainElement.offsetLeft;
   var pinMainTop = mapPinMainElement.offsetTop;
+
+  var dragElement;
 
 
   function disableForm() {
@@ -175,8 +177,10 @@
         photoElement.src = reader.result;
         photoElement.width = Photo.WIDTH;
         photoElement.height = Photo.HEIGHT;
+        photoElement.draggable = true;
         var photoWrapElement = document.createElement('div');
-        photoWrapElement.classList.add('ad-form__photo');
+        photoWrapElement.classList.add('ad-form__photo', 'ad-form__photo--dropzone');
+        photoWrapElement.style = 'padding: 5px';
         photoWrapElement.appendChild(photoElement);
         photoContainerElement.insertBefore(photoWrapElement, photoPreviewElement);
       });
@@ -240,12 +244,48 @@
     addPhoto(file);
   }
 
+  function onPhotoItemDragstart(evt) {
+    dragElement = evt.target.parentElement;
+    dragElement.style.outline = 'brown dashed 1px';
+    dragElement.style.opacity = '0.5';
+    evt.dataTransfer.effectAllowed = 'move';
+
+    photoContainerElement.addEventListener('dragover', onPhotoItemDragover);
+    photoContainerElement.addEventListener('dragend', onPhotoItemDragend);
+  }
+
+  function onPhotoItemDragover(evt) {
+    evt.preventDefault();
+    var target = evt.target.closest('.ad-form__photo--dropzone');
+
+    if (target && target !== dragElement) {
+      var rect = target.getBoundingClientRect();
+      var side = (evt.clientX - rect.left) / (rect.right - rect.left);
+
+      if (side > 0.5) {
+        target.parentElement.insertBefore(dragElement, target.nextSibling);
+      } else {
+        target.parentElement.insertBefore(dragElement, target);
+      }
+    }
+  }
+
+  function onPhotoItemDragend(evt) {
+    evt.preventDefault();
+    dragElement.style.outline = '';
+    dragElement.style.opacity = '';
+
+    photoContainerElement.removeEventListener('dragover', onPhotoItemDragover);
+    photoContainerElement.removeEventListener('dragend', onPhotoItemDragend);
+  }
+
 
   photoChooserElement.addEventListener('change', onPhotoChange);
   photoDropZoneElement.addEventListener('dragenter', onPhotoDragenter);
   photoDropZoneElement.addEventListener('dragleave', onPhotoDragleave);
   photoDropZoneElement.addEventListener('dragover', onPhotoDragover);
   photoDropZoneElement.addEventListener('drop', onPhotoDrop);
+  photoContainerElement.addEventListener('dragstart', onPhotoItemDragstart);
 
   avatarChooserElement.addEventListener('change', onAvatarChange);
   avatarDropZoneElement.addEventListener('dragenter', onAvatarDragenter);
