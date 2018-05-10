@@ -119,9 +119,9 @@
   }
 
   function onTypeChange() {
-    var type = typeElement.value.toUpperCase();
-    priceElement.min = PriceMin[type];
-    priceElement.placeholder = PriceMin[type];
+    var housingType = typeElement.value.toUpperCase();
+    priceElement.min = PriceMin[housingType];
+    priceElement.placeholder = PriceMin[housingType];
   }
 
   function onFormSubmit(evt) {
@@ -262,12 +262,9 @@
     if (target && target !== dragElement) {
       var bounds = target.getBoundingClientRect();
       var side = (evt.clientX - bounds.left) / (bounds.right - bounds.left);
+      var nextElement = side > 0.5 ? target.nextSibling : target;
 
-      if (side > 0.5) {
-        target = target.nextSibling;
-      }
-
-      target.parentElement.insertBefore(dragElement, target);
+      target.parentElement.insertBefore(dragElement, nextElement);
     }
   }
 
