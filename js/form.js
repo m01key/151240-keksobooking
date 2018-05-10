@@ -5,16 +5,16 @@
   var NOTIFICATION_TIME = 3000;
   var FILE_TYPE = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 
+  var Photo = {
+    WIDTH: 60,
+    HEIGHT: 60
+  };
+
   var PriceMin = {
     BUNGALO: 0,
     FLAT: 1000,
     HOUSE: 5000,
     PALACE: 10000
-  };
-
-  var Photo = {
-    WIDTH: 70,
-    HEIGHT: 70
   };
 
   var notification = document.querySelector('.success');
@@ -25,13 +25,13 @@
 
   var avatarChooserElement = formElement.querySelector('.ad-form-header__input');
   var avatarPreviewElement = formElement.querySelector('.ad-form-header__preview img');
-  var avatarDropZone = formElement.querySelector('.ad-form-header__drop-zone');
+  var avatarDropZoneElement = formElement.querySelector('.ad-form-header__drop-zone');
   var avatarSource = avatarPreviewElement.src;
 
   var photoChooserElement = formElement.querySelector('.ad-form__input');
   var photoPreviewElement = formElement.querySelector('.ad-form__photo');
   var photoContainerElement = formElement.querySelector('.ad-form__photo-container');
-  var photoDropZone = formElement.querySelector('.ad-form__drop-zone');
+  var photoDropZoneElement = formElement.querySelector('.ad-form__drop-zone');
 
   var guestsElement = formElement.querySelector('#capacity');
   var timeinElement = formElement.querySelector('#timein');
@@ -46,13 +46,17 @@
   var pinMainLeft = mapPinMainElement.offsetLeft;
   var pinMainTop = mapPinMainElement.offsetTop;
 
+  var dragElement;
+
 
   function disableForm() {
     fieldsetElements.forEach(function (it) {
       it.disabled = true;
     });
     formElement.reset();
-    addressElement.value = window.map.getCoordsPinMain();
+    priceElement.min = PriceMin.FLAT;
+    priceElement.placeholder = PriceMin.FLAT;
+    addressElement.value = window.map.getPinMainCoordinates();
   }
 
   function deactivateSite() {
@@ -70,7 +74,7 @@
     });
 
     window.card.close();
-    window.map.clearPins();
+    window.map.clear();
     mapFiltersElement.reset();
     disableForm();
 
@@ -115,35 +119,21 @@
   }
 
   function onTypeChange() {
-    switch (typeElement.value) {
-      case 'bungalo':
-        priceElement.min = PriceMin.BUNGALO;
-        priceElement.placeholder = PriceMin.BUNGALO;
-        break;
-      case 'flat':
-        priceElement.min = PriceMin.FLAT;
-        priceElement.placeholder = PriceMin.FLAT;
-        break;
-      case 'house':
-        priceElement.min = PriceMin.HOUSE;
-        priceElement.placeholder = PriceMin.HOUSE;
-        break;
-      default:
-        priceElement.min = PriceMin.PALACE;
-        priceElement.placeholder = PriceMin.PALACE;
-    }
+    var housingType = typeElement.value.toUpperCase();
+    priceElement.min = PriceMin[housingType];
+    priceElement.placeholder = PriceMin[housingType];
   }
 
-  function onFormSubmit(e) {
-    e.preventDefault();
+  function onFormSubmit(evt) {
+    evt.preventDefault();
 
     var formData = new FormData(formElement);
     window.backend.upload(formData, onUpload, window.map.onError);
     window.map.isActive = false;
   }
 
-  function onFormReset(e) {
-    e.preventDefault();
+  function onFormReset(evt) {
+    evt.preventDefault();
 
     deactivateSite();
   }
@@ -188,8 +178,10 @@
         photoElement.src = reader.result;
         photoElement.width = Photo.WIDTH;
         photoElement.height = Photo.HEIGHT;
+        photoElement.draggable = true;
         var photoWrapElement = document.createElement('div');
-        photoWrapElement.classList.add('ad-form__photo');
+        photoWrapElement.classList.add('ad-form__photo', 'ad-form__photo--dropzone');
+        photoWrapElement.style = 'padding: 5px';
         photoWrapElement.appendChild(photoElement);
         photoContainerElement.insertBefore(photoWrapElement, photoPreviewElement);
       });
@@ -205,22 +197,22 @@
   }
 
   function onAvatarDragenter() {
-    avatarDropZone.style.border = 'dashed 1px brown';
+    avatarDropZoneElement.style.border = 'dashed 1px brown';
   }
 
   function onAvatarDragleave() {
-    avatarDropZone.style.border = '';
+    avatarDropZoneElement.style.border = '';
   }
 
-  function onAvatarDragover(e) {
-    e.preventDefault();
+  function onAvatarDragover(evt) {
+    evt.preventDefault();
   }
 
-  function onAvatarDrop(e) {
-    e.preventDefault();
-    avatarDropZone.style.border = '';
+  function onAvatarDrop(evt) {
+    evt.preventDefault();
+    avatarDropZoneElement.style.border = '';
 
-    var dragData = e.dataTransfer;
+    var dragData = evt.dataTransfer;
     var file = dragData.files[0];
 
     showAvatar(file);
@@ -232,39 +224,72 @@
   }
 
   function onPhotoDragenter() {
-    photoDropZone.style.border = 'dashed 1px brown';
+    photoDropZoneElement.style.border = 'dashed 1px brown';
   }
 
   function onPhotoDragleave() {
-    photoDropZone.style.border = '';
+    photoDropZoneElement.style.border = '';
   }
 
-  function onPhotoDragover(e) {
-    e.preventDefault();
+  function onPhotoDragover(evt) {
+    evt.preventDefault();
   }
 
-  function onPhotoDrop(e) {
-    e.preventDefault();
-    photoDropZone.style.border = '';
+  function onPhotoDrop(evt) {
+    evt.preventDefault();
+    photoDropZoneElement.style.border = '';
 
-    var dragData = e.dataTransfer;
+    var dragData = evt.dataTransfer;
     var file = dragData.files[0];
 
     addPhoto(file);
   }
 
+  function onPhotoItemDragstart(evt) {
+    dragElement = evt.target.parentElement;
+    dragElement.style.outline = 'brown dashed 1px';
+    dragElement.style.opacity = '0.5';
+    evt.dataTransfer.effectAllowed = 'move';
+
+    photoContainerElement.addEventListener('dragover', onPhotoItemDragover);
+    photoContainerElement.addEventListener('dragend', onPhotoItemDragend);
+  }
+
+  function onPhotoItemDragover(evt) {
+    evt.preventDefault();
+    var target = evt.target.closest('.ad-form__photo--dropzone');
+
+    if (target && target !== dragElement) {
+      var bounds = target.getBoundingClientRect();
+      var side = (evt.clientX - bounds.left) / (bounds.right - bounds.left);
+      var nextElement = side > 0.5 ? target.nextSibling : target;
+
+      target.parentElement.insertBefore(dragElement, nextElement);
+    }
+  }
+
+  function onPhotoItemDragend(evt) {
+    evt.preventDefault();
+    dragElement.style.outline = '';
+    dragElement.style.opacity = '';
+
+    photoContainerElement.removeEventListener('dragover', onPhotoItemDragover);
+    photoContainerElement.removeEventListener('dragend', onPhotoItemDragend);
+  }
+
 
   photoChooserElement.addEventListener('change', onPhotoChange);
-  photoDropZone.addEventListener('dragenter', onPhotoDragenter);
-  photoDropZone.addEventListener('dragleave', onPhotoDragleave);
-  photoDropZone.addEventListener('dragover', onPhotoDragover);
-  photoDropZone.addEventListener('drop', onPhotoDrop);
+  photoDropZoneElement.addEventListener('dragenter', onPhotoDragenter);
+  photoDropZoneElement.addEventListener('dragleave', onPhotoDragleave);
+  photoDropZoneElement.addEventListener('dragover', onPhotoDragover);
+  photoDropZoneElement.addEventListener('drop', onPhotoDrop);
+  photoContainerElement.addEventListener('dragstart', onPhotoItemDragstart);
 
   avatarChooserElement.addEventListener('change', onAvatarChange);
-  avatarDropZone.addEventListener('dragenter', onAvatarDragenter);
-  avatarDropZone.addEventListener('dragleave', onAvatarDragleave);
-  avatarDropZone.addEventListener('dragover', onAvatarDragover);
-  avatarDropZone.addEventListener('drop', onAvatarDrop);
+  avatarDropZoneElement.addEventListener('dragenter', onAvatarDragenter);
+  avatarDropZoneElement.addEventListener('dragleave', onAvatarDragleave);
+  avatarDropZoneElement.addEventListener('dragover', onAvatarDragover);
+  avatarDropZoneElement.addEventListener('drop', onAvatarDrop);
 
   guestsElement.addEventListener('change', onGuestsChange);
   roomsElement.addEventListener('change', onRoomsChange);

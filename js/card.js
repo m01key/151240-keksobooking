@@ -20,13 +20,13 @@
   var mapFiltersElement = document.querySelector('.map__filters-container');
 
 
-  function onCloseCardClick(e) {
-    var cardElement = e.target.closest('.map__card');
+  function onCloseCardClick(evt) {
+    var cardElement = evt.target.closest('.map__card');
     closeCard(cardElement);
   }
 
-  function onEscKeyDown(e) {
-    if (e.keyCode === KEY_ESC) {
+  function onEscKeyDown(evt) {
+    if (evt.keyCode === KEY_ESC) {
       window.card.close();
     }
   }

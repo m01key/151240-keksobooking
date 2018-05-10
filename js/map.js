@@ -2,17 +2,18 @@
 
 (function () {
 
-  var PIN_MAIN_SIZE = 65;
+  var PIN_WIDTH = 65;
+  var PIN_HEIGHT = 84;
   var PIN_MIN_Y = 150;
   var PIN_MAX_Y = 500;
   var DEBOUNCE_TIME = 500;
   var OFFERS_AMOUNT = 5;
   var ERROR_TIME = 3000;
 
-  var Pin = {
-    MAX_TOP: PIN_MAX_Y - PIN_MAIN_SIZE,
-    MIN_TOP: PIN_MIN_Y - PIN_MAIN_SIZE,
-    MIN_LEFT: 0
+  var PinBound = {
+    MAX_TOP: PIN_MAX_Y - PIN_HEIGHT,
+    MIN_TOP: PIN_MIN_Y - PIN_HEIGHT,
+    MIN_LEFT: 0 - PIN_WIDTH / 2
   };
 
   var Price = {
@@ -28,7 +29,7 @@
   var filterPriceElement = mapFiltersElement.elements['housing-price'];
   var filterRoomsElement = mapFiltersElement.elements['housing-rooms'];
   var filterGuestsElement = mapFiltersElement.elements['housing-guests'];
-  var filterFeatures = mapFiltersElement.elements['features'];
+  var filterFeatureElements = mapFiltersElement.elements['features'];
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
@@ -60,12 +61,11 @@
     });
   }
 
-  function getCoordsPinMain(center) {
-    var shift = center === 'center' ? 2 : 1;
-    var left = parseInt(mapPinMainElement.offsetLeft, 10) + PIN_MAIN_SIZE / 2;
-    var top = parseInt(mapPinMainElement.offsetTop, 10) + PIN_MAIN_SIZE / shift;
+  function getPinMainCoordinates() {
+    var left = mapPinMainElement.offsetLeft + PIN_WIDTH / 2;
+    var top = mapPinMainElement.offsetTop + PIN_HEIGHT;
 
-    return left + ', ' + top;
+    return Math.floor(left) + ', ' + Math.floor(top);
   }
 
   function activateSite() {
@@ -74,7 +74,7 @@
     fieldsetElements.forEach(function (it) {
       it.disabled = false;
     });
-    addressElement.value = getCoordsPinMain();
+    addressElement.value = getPinMainCoordinates();
     window.backend.load(onLoad, onError);
     window.map.isActive = true;
   }
@@ -93,16 +93,10 @@
     return filterValue === 'any' || filterValue === offerValue;
   }
 
-  function checkFeature(offerValueArr, filterValueArr) {
-    var filterCheckedArr = [].filter.call(filterValueArr, function (it) {
-      return it.checked;
+  function checkFeature(offerValues, filterValues) {
+    return [].every.call(filterValues, function (it) {
+      return !(it.checked && offerValues.indexOf(it.value) === -1);
     });
-    for (var i = 0; i < filterCheckedArr.length; i++) {
-      if (offerValueArr.indexOf(filterCheckedArr[i].value) === -1) {
-        return false;
-      }
-    }
-    return true;
   }
 
   function onFilterChange() {
@@ -111,7 +105,7 @@
         checkField(it.offer.rooms, filterRoomsElement.value) &&
         checkField(it.offer.guests, filterGuestsElement.value) &&
         checkPrice(it.offer.price, filterPriceElement.value) &&
-        checkFeature(it.offer.features, filterFeatures);
+        checkFeature(it.offer.features, filterFeatureElements);
     });
 
     window.card.close();
@@ -134,15 +128,15 @@
     renderPins(offersData);
   }
 
-  function onPinMainMouseDown(e) {
-    var maxLeft = mapElement.offsetWidth - PIN_MAIN_SIZE;
+  function onPinMainMouseDown(evt) {
+    var maxLeft = mapElement.offsetWidth - PIN_WIDTH / 2;
 
-    var startX = e.clientX;
-    var startY = e.clientY;
+    var startX = evt.clientX;
+    var startY = evt.clientY;
 
-    function onMouseMove(evt) {
-      var endX = evt.clientX;
-      var endY = evt.clientY;
+    function onMouseMove(evtMove) {
+      var endX = evtMove.clientX;
+      var endY = evtMove.clientY;
 
       var shiftLeft = endX - startX;
       var shiftTop = endY - startY;
@@ -150,22 +144,22 @@
       var newLeft = mapPinMainElement.offsetLeft + shiftLeft;
       var newTop = mapPinMainElement.offsetTop + shiftTop;
 
-      if (newLeft < Pin.MIN_LEFT) {
-        newLeft = Pin.MIN_LEFT;
+      if (newLeft < PinBound.MIN_LEFT) {
+        newLeft = PinBound.MIN_LEFT;
       } else if (newLeft > maxLeft) {
         newLeft = maxLeft;
       }
 
-      if (newTop < Pin.MIN_TOP) {
-        newTop = Pin.MIN_TOP;
-      } else if (newTop > Pin.MAX_TOP) {
-        newTop = Pin.MAX_TOP;
+      if (newTop < PinBound.MIN_TOP) {
+        newTop = PinBound.MIN_TOP;
+      } else if (newTop > PinBound.MAX_TOP) {
+        newTop = PinBound.MAX_TOP;
       }
 
       mapPinMainElement.style.left = newLeft + 'px';
       mapPinMainElement.style.top = newTop + 'px';
 
-      addressElement.value = getCoordsPinMain();
+      addressElement.value = getPinMainCoordinates();
 
       startX = endX;
       startY = endY;
@@ -190,8 +184,8 @@
 
 
   window.map = {
-    getCoordsPinMain: getCoordsPinMain,
-    clearPins: clearPins,
+    getPinMainCoordinates: getPinMainCoordinates,
+    clear: clearPins,
     onError: onError,
     isActive: false
   };

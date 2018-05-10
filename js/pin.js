@@ -24,8 +24,8 @@
       window.card.close();
       window.card.show(data);
     });
-    pinElement.addEventListener('keydown', function (e) {
-      if (e.keyCode === KEY_ENTER) {
+    pinElement.addEventListener('keydown', function (evt) {
+      if (evt.keyCode === KEY_ENTER) {
         window.card.close();
         window.card.show(data);
       }
