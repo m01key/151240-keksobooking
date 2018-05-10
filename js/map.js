@@ -33,8 +33,8 @@
   var formElement = document.querySelector('.ad-form');
   var fieldsetElements = formElement.querySelectorAll('fieldset');
   var addressElement = formElement.querySelector('#address');
-  var checkedFilterValues = null;
-  var isIterated = false;
+  // var checkedFilterValues = null;
+  // var isIterated = false;
   var offersData;
   var timerId;
 
@@ -96,29 +96,33 @@
   }
 
   function checkFeature(offerValues, filterValues) {
-    if (!isIterated) {
-      checkedFilterValues = [].filter.call(filterValues, function (it) {
-        return it.checked;
-      });
-      isIterated = true;
-    }
+    // if (!isIterated) {
+    //   checkedFilterValues = [].filter.call(filterValues, function (it) {
+    //     return it.checked;
+    //   });
+    //   isIterated = true;
+    // }
 
-    return [].every.call(checkedFilterValues, function (it) {
+    return [].every.call(filterValues, function (it) {
       return offerValues.indexOf(it.value) !== -1;
     });
   }
 
   function onFilterChange() {
+    var checkedFilterValues = [].filter.call(filterFeatureElements, function (it) {
+      return it.checked;
+    });
+
     var offersFiltered = offersData.filter(function (it) {
       return checkField(it.offer.type, filterTypeElement.value) &&
         checkField(it.offer.rooms, filterRoomsElement.value) &&
         checkField(it.offer.guests, filterGuestsElement.value) &&
         checkPrice(it.offer.price, filterPriceElement.value) &&
-        checkFeature(it.offer.features, filterFeatureElements);
+        checkFeature(it.offer.features, checkedFilterValues);
     });
 
-    checkedFilterValues = null;
-    isIterated = false;
+    // checkedFilterValues = null;
+    // isIterated = false;
 
     window.card.close();
     debounce(renderPins, offersFiltered);
