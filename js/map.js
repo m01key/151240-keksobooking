@@ -10,7 +10,7 @@
   var OFFERS_AMOUNT = 5;
   var ERROR_TIME = 3000;
 
-  var PinBorder = {
+  var PinBound = {
     MAX_TOP: PIN_MAX_Y - PIN_HEIGHT,
     MIN_TOP: PIN_MIN_Y - PIN_HEIGHT,
     MIN_LEFT: 0 - PIN_WIDTH / 2
@@ -144,16 +144,16 @@
       var newLeft = mapPinMainElement.offsetLeft + shiftLeft;
       var newTop = mapPinMainElement.offsetTop + shiftTop;
 
-      if (newLeft < PinBorder.MIN_LEFT) {
-        newLeft = PinBorder.MIN_LEFT;
+      if (newLeft < PinBound.MIN_LEFT) {
+        newLeft = PinBound.MIN_LEFT;
       } else if (newLeft > maxLeft) {
         newLeft = maxLeft;
       }
 
-      if (newTop < PinBorder.MIN_TOP) {
-        newTop = PinBorder.MIN_TOP;
-      } else if (newTop > PinBorder.MAX_TOP) {
-        newTop = PinBorder.MAX_TOP;
+      if (newTop < PinBound.MIN_TOP) {
+        newTop = PinBound.MIN_TOP;
+      } else if (newTop > PinBound.MAX_TOP) {
+        newTop = PinBound.MAX_TOP;
       }
 
       mapPinMainElement.style.left = newLeft + 'px';

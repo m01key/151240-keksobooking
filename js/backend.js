@@ -12,7 +12,7 @@
   };
 
 
-  function addErrorsListeners(xhr, onError) {
+  function addErrorListeners(xhr, onError) {
     xhr.timeout = TIMEOUT;
 
     xhr.addEventListener('error', function () {
@@ -41,7 +41,7 @@
       }
     });
 
-    addErrorsListeners(xhr, onError);
+    addErrorListeners(xhr, onError);
 
     xhr.open('GET', URL_LOAD);
     xhr.send();
@@ -59,7 +59,7 @@
       }
     });
 
-    addErrorsListeners(xhr, onError);
+    addErrorListeners(xhr, onError);
 
     xhr.open('POST', URL_UPLOAD);
     xhr.send(data);

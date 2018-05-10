@@ -10,11 +10,11 @@
     HEIGHT: 60
   };
 
-  var priceMin = {
-    bungalo: 0,
-    flat: 1000,
-    house: 5000,
-    palace: 10000
+  var PriceMin = {
+    BUNGALO: 0,
+    FLAT: 1000,
+    HOUSE: 5000,
+    PALACE: 10000
   };
 
   var notification = document.querySelector('.success');
@@ -54,8 +54,8 @@
       it.disabled = true;
     });
     formElement.reset();
-    priceElement.min = priceMin.flat;
-    priceElement.placeholder = priceMin.flat;
+    priceElement.min = PriceMin.FLAT;
+    priceElement.placeholder = PriceMin.FLAT;
     addressElement.value = window.map.getPinMainCoordinates();
   }
 
@@ -119,8 +119,9 @@
   }
 
   function onTypeChange() {
-    priceElement.min = priceMin[typeElement.value];
-    priceElement.placeholder = priceMin[typeElement.value];
+    var type = typeElement.value.toUpperCase();
+    priceElement.min = PriceMin[type];
+    priceElement.placeholder = PriceMin[type];
   }
 
   function onFormSubmit(evt) {
@@ -259,14 +260,12 @@
     var target = evt.target.closest('.ad-form__photo--dropzone');
 
     if (target && target !== dragElement) {
-      var rect = target.getBoundingClientRect();
-      var side = (evt.clientX - rect.left) / (rect.right - rect.left);
+      var bounds = target.getBoundingClientRect();
+      var side = (evt.clientX - bounds.left) / (bounds.right - bounds.left);
 
-      if (side > 0.5) {
-        target.parentElement.insertBefore(dragElement, target.nextSibling);
-      } else {
-        target.parentElement.insertBefore(dragElement, target);
-      }
+      target = side > 0.5 ? target.nextSibling : target;
+
+      target.parentElement.insertBefore(dragElement, target);
     }
   }
 
